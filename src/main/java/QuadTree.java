@@ -1,3 +1,5 @@
+enum direction {NE, SE, SW, NW}
+
 class Point {
     private final float x;
     private final float y;
@@ -7,9 +9,13 @@ class Point {
         this.y = y;
     }
 
-    public float getX() { return x; }
+    public float getX() {
+        return x;
+    }
 
-    public float getY() { return y; }
+    public float getY() {
+        return y;
+    }
 
     @Override
     public String toString() {
@@ -18,7 +24,7 @@ class Point {
 }
 
 class MyPair {
-    private final int  id;
+    private final int id;
     private final float distance;
 
     public MyPair(int id, float distance) {
@@ -26,16 +32,18 @@ class MyPair {
         this.distance = distance;
     }
 
-    public float getDistance() { return distance; }
+    public float getDistance() {
+        return distance;
+    }
 
-    public int getId() { return id; }
+    public int getId() {
+        return id;
+    }
 }
-
-enum direction {NE, SE, SW, NW}
 
 class Node {
     private final int id;
-    private Point representative;
+    private final Point representative;
     private Area quadrant;
     private Node ne, se, sw, nw;
 
@@ -48,27 +56,49 @@ class Node {
         return id;
     }
 
-    public Node getNe() { return ne; }
+    public Node getNe() {
+        return ne;
+    }
 
-    public void setNe(Node ne) { this.ne = ne; }
+    public void setNe(Node ne) {
+        this.ne = ne;
+    }
 
-    public Node getSe() { return se; }
+    public Node getSe() {
+        return se;
+    }
 
-    public void setSe(Node se) { this.se = se; }
+    public void setSe(Node se) {
+        this.se = se;
+    }
 
-    public Node getNw() { return nw; }
+    public Node getNw() {
+        return nw;
+    }
 
-    public void setNw(Node nw) { this.nw = nw; }
+    public void setNw(Node nw) {
+        this.nw = nw;
+    }
 
-    public Node getSw() { return sw; }
+    public Node getSw() {
+        return sw;
+    }
 
-    public void setSw(Node sw) { this.sw = sw; }
+    public void setSw(Node sw) {
+        this.sw = sw;
+    }
 
-    public Point getRepresentative() { return representative; }
+    public Point getRepresentative() {
+        return representative;
+    }
 
-    public Area getQuadrant() { return quadrant; }
+    public Area getQuadrant() {
+        return quadrant;
+    }
 
-    public void setQuadrant(Area q) { quadrant = q; }
+    public void setQuadrant(Area q) {
+        quadrant = q;
+    }
 }
 
 class Area {
@@ -107,18 +137,51 @@ class Area {
         }
     }
 
-    public float getyUp() { return yUp; }
+    public float getyUp() {
+        return yUp;
+    }
 
-    public float getyDown() { return yDown; }
+    public float getyDown() {
+        return yDown;
+    }
 
-    public float getxRight() { return xRight; }
+    public float getxRight() {
+        return xRight;
+    }
 
-    public float getxLeft() { return xLeft; }
+    public float getxLeft() {
+        return xLeft;
+    }
 }
 
 public class QuadTree {
 
     private Node root;
+
+    public static void main(String[] args) {
+        QuadTree quadTree = new QuadTree();
+        Hospital[] vector = new Hospital[9];
+
+        //Wygląda to tragicznie, ale chciałem mieć dodawanie szpitali pod kontrolą,
+        // a nie chciało mi się pisać specjalnej metody do dodawania szpitali :p,
+        vector[0] = new Hospital(0, "0", -10, -10, 10);
+        vector[1] = new Hospital(1, "1", -10, 10, 10);
+        vector[2] = new Hospital(2, "2", 10, -10, 10);
+        vector[3] = new Hospital(3, "3", 10, 10, 10);
+        vector[4] = new Hospital(4, "4", 0, 0, 10);
+        vector[5] = new Hospital(5, "5", 1, 3, 10);
+        vector[6] = new Hospital(6, "6", 1, 1, 10);
+        vector[7] = new Hospital(7, "7", 3, 3, 10);
+        vector[8] = new Hospital(8, "8", 3, 1, 10);
+
+        //Docelowo będzie przeszukiwać jedynie szpitale na obrzeżach zamiast wszystkich.
+        Area quadrant = quadTree.calcQuadrant(vector);
+        quadTree.fillTree(vector, quadrant);
+
+        Point patient = new Point(1, 4);
+        int nearestId = quadTree.findNearest(patient);
+        System.out.println("Punkt " + patient.toString() + ". Id najbliższego szpitala: " + nearestId);
+    }
 
     public void fillTree(Hospital[] vector, Area quadrant) {
         for (Hospital x : vector) {
@@ -258,8 +321,6 @@ public class QuadTree {
         return searchNode(root, patient, pair).getId();
     }
 
-    private enum position {UP, DOWN, RIGHT, LEFT}
-
     private MyPair checkNeNeighbours(Node parent, Point patient, float bestDistance) {
         MyPair pair = checkBorderingNeighbour(parent.getSe(), patient, bestDistance, position.DOWN);
         pair = checkBorderingNeighbour(parent.getNw(), patient, pair.getDistance(), position.LEFT);
@@ -394,28 +455,5 @@ public class QuadTree {
         return (float) (Math.pow(xn - xp, 2) + Math.pow(yn - yp, 2));
     }
 
-    public static void main(String[] args) {
-        QuadTree quadTree = new QuadTree();
-        Hospital[] vector = new Hospital[9];
-
-        //Wygląda to tragicznie, ale chciałem mieć dodawanie szpitali pod kontrolą,
-        // a nie chciało mi się pisać specjalnej metody do dodawania szpitali :p,
-        vector[0] = new Hospital(0, "0", -10, -10, 10);
-        vector[1] = new Hospital(1, "1", -10, 10, 10);
-        vector[2] = new Hospital(2, "2", 10, -10, 10);
-        vector[3] = new Hospital(3, "3", 10, 10, 10);
-        vector[4] = new Hospital(4, "4", 0, 0, 10);
-        vector[5] = new Hospital(5, "5", 1, 3, 10);
-        vector[6] = new Hospital(6, "6", 1, 1, 10);
-        vector[7] = new Hospital(7, "7", 3, 3, 10);
-        vector[8] = new Hospital(8, "8", 3, 1, 10);
-
-        //Docelowo będzie przeszukiwać jedynie szpitale na obrzeżach zamiast wszystkich.
-        Area quadrant = quadTree.calcQuadrant(vector);
-        quadTree.fillTree(vector, quadrant);
-
-        Point patient = new Point(1, 4);
-        int nearestId = quadTree.findNearest(patient);
-        System.out.println("Punkt " + patient.toString() + ". Id najbliższego szpitala: " + nearestId);
-    }
+    private enum position {UP, DOWN, RIGHT, LEFT}
 }
