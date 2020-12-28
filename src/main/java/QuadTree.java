@@ -164,15 +164,15 @@ public class QuadTree {
 
         //Wygląda to tragicznie, ale chciałem mieć dodawanie szpitali pod kontrolą,
         // a nie chciało mi się pisać specjalnej metody do dodawania szpitali :p,
-        vector[0] = new Hospital(0, "0", -10, -10, 10);
-        vector[1] = new Hospital(1, "1", -10, 10, 10);
-        vector[2] = new Hospital(2, "2", 10, -10, 10);
-        vector[3] = new Hospital(3, "3", 10, 10, 10);
-        vector[4] = new Hospital(4, "4", 0, 0, 10);
-        vector[5] = new Hospital(5, "5", 1, 3, 10);
-        vector[6] = new Hospital(6, "6", 1, 1, 10);
-        vector[7] = new Hospital(7, "7", 3, 3, 10);
-        vector[8] = new Hospital(8, "8", 3, 1, 10);
+        vector[0] = new Hospital(0, "0", -10, -10, 10, 10);
+        vector[1] = new Hospital(1, "1", -10, 10, 10, 10);
+        vector[2] = new Hospital(2, "2", 10, -10, 10, 10);
+        vector[3] = new Hospital(3, "3", 10, 10, 10, 10);
+        vector[4] = new Hospital(4, "4", 0, 0, 10, 10);
+        vector[5] = new Hospital(5, "5", 1, 3, 10, 10);
+        vector[6] = new Hospital(6, "6", 1, 1, 10, 10);
+        vector[7] = new Hospital(7, "7", 3, 3, 10, 10);
+        vector[8] = new Hospital(8, "8", 3, 1, 10, 10);
 
         //Docelowo będzie przeszukiwać jedynie szpitale na obrzeżach zamiast wszystkich.
         Area quadrant = quadTree.calcQuadrant(vector);

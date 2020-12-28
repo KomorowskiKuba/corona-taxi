@@ -2,21 +2,14 @@ public abstract class MapObject {
     private final int x;
     private final int y;
     private final int id;
-    private final String name;
 
-    MapObject(int id, String name, int x, int y) {
-        this.id = id;
-        this.name = name;
-        this.x = x;
+    MapObject(int id, int x, int y) {
+        this.id = id;this.x = x;
         this.y = y;
     }
 
     public int getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public int getX() {
@@ -25,5 +18,13 @@ public abstract class MapObject {
 
     public int getY() {
         return y;
+    }
+
+    @Override
+    public String toString() {
+        return  "x=" + x +
+                ", y=" + y +
+                ", id=" + id +
+                ", ";
     }
 }
