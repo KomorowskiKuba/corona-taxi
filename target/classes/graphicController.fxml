@@ -1,11 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Polygon?>
+<?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GraphicController">
-   <children>
-      <Button mnemonicParsing="false" prefHeight="133.0" prefWidth="146.0" text="Button" />
-   </children>
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GraphicController">
+    <BorderPane fx:id="pane" prefHeight="720.0" prefWidth="1280.0">
+        <right>
+            <HBox prefWidth="320.0" BorderPane.alignment="CENTER">
+                <Separator orientation="VERTICAL" prefHeight="200.0" />
+                <VBox prefHeight="688.0" prefWidth="320.0">
+                    <Label alignment="CENTER" prefHeight="32.0" prefWidth="320.0" text="Nazwa pliku z danymi wejściowymi:" textAlignment="CENTER">
+                        <font>
+                            <Font name="Arial Bold" size="14.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="hospitalFile" prefHeight="32.0" prefWidth="256.0" text="src/data/sampleData.txt">
+                        <VBox.margin>
+                            <Insets left="32.0" right="32.0" />
+                        </VBox.margin>
+                    </TextField>
+                    <Region prefHeight="24.0" prefWidth="320.0" />
+                    <Label alignment="CENTER" prefHeight="32.0" prefWidth="320.0" text="Nazwa pliku z lokalizacjami pacjentów:" textAlignment="CENTER">
+                        <font>
+                            <Font name="Arial Bold" size="14.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="patientFile" prefHeight="32.0" prefWidth="320.0" text="src/data/patients.txt">
+                        <VBox.margin>
+                            <Insets left="32.0" right="32.0" />
+                        </VBox.margin>
+                    </TextField>
+                    <Region prefHeight="24.0" prefWidth="320.0">
+                        <VBox.margin>
+                            <Insets left="4.0" />
+                        </VBox.margin>
+                    </Region>
+                    <Label alignment="CENTER" prefHeight="32.0" prefWidth="320.0" text="Prędkość odtwarzania animacji [s]:" textAlignment="CENTER">
+                        <font>
+                            <Font name="Arial Bold" size="14.0" />
+                        </font>
+                    </Label>
+                    <Region prefHeight="8.0" prefWidth="320.0" />
+                    <Slider fx:id="animSlider" blockIncrement="0.0" cache="true" majorTickUnit="0.1" max="1.0" min="0.1" minorTickCount="0" prefHeight="28.0" prefWidth="300.0" showTickLabels="true" showTickMarks="true" snapToTicks="true">
+                        <VBox.margin>
+                            <Insets left="40.0" right="40.0" />
+                        </VBox.margin>
+                    </Slider>
+                    <Region prefHeight="24.0" prefWidth="320.0" />
+                    <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleButtonClick" prefHeight="26.0" prefWidth="320.0" text="Generuj rozwiązanie">
+                        <font>
+                            <Font name="Arial Bold" size="12.0" />
+                        </font>
+                        <VBox.margin>
+                            <Insets left="32.0" right="32.0" />
+                        </VBox.margin>
+                    </Button>
+                    <Separator prefWidth="320.0">
+                        <VBox.margin>
+                            <Insets bottom="16.0" top="16.0" />
+                        </VBox.margin>
+                    </Separator>
+                    <TextArea fx:id="output" editable="false" prefHeight="350.0" wrapText="true">
+                        <VBox.margin>
+                            <Insets left="16.0" right="16.0" />
+                        </VBox.margin>
+                    </TextArea>
+                </VBox>
+            </HBox>
+        </right>
+      <center>
+          <Pane maxHeight="720.0" maxWidth="1280.0" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <BorderPane.margin>
+                  <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
+              </BorderPane.margin>
+              <Polygon fx:id="country" fill="DODGERBLUE" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0"
+                       visible="false">
+              </Polygon>
+          </Pane>
+      </center>
+    </BorderPane>
 </AnchorPane>

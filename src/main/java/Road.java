@@ -20,4 +20,10 @@ public class Road {
                 ", distance=" + distance +
                 '}';
     }
+
+    public int getFirstHospitalId() { return firstHospitalId; }
+
+    public int getSecondHospitalId() {
+        return secondHospitalId;
+    }
 }

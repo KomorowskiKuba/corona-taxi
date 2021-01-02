@@ -218,7 +218,6 @@ public class InputFileReader {
     }
 
     public static void main(String[] args) {
-        String location1 = "C:\\Users\\korni\\OneDrive\\Pulpit\\data.kot.cmdddd";
         String location2 = "src/data/sampleData.txt";
         InputFileReader ifr = null;
 

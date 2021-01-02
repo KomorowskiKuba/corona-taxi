@@ -1,0 +1,44 @@
+.dialog-pane {
+    -fx-border-color: red;
+}
+
+/**Costumization of The Bar where the buttons are located**/
+.dialog-pane > .button-bar > .container {
+    -fx-background-color: red;
+}
+
+.dialog-pane > .content.label {
+    -fx-padding: 1em;
+    -fx-background-color: red;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/**Costumization of DialogPane Header**/
+.dialog-pane > .header-panel {
+    -fx-background-color: red;
+}
+
+.dialog-pane > .header-panel .label {
+    -fx-background-color: red;
+    -fx-background-radius: 10px;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+/**Costumization of Buttons**/
+.dialog-pane .button {
+    -fx-background-color: red;
+    -fx-text-fill: white;
+    -fx-wrap-text: true;
+    -fx-effect: dropshadow(gaussian, white, 10.0, 0.25, 0.0, 0.0);
+    -fx-cursor: hand;
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: red;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
