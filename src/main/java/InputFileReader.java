@@ -22,6 +22,10 @@ public class InputFileReader {
         roadList = new ArrayList<>();
         patientList = new ArrayList<>();
 
+        if (filePath.isEmpty()) {
+            throw new IllegalArgumentException("Nie podano nazwy pliku wejsciowego!");
+        }
+
         if (checkFileFormat(filePath)) {
             readFromFile(filePath, readPatients);
         } else {
