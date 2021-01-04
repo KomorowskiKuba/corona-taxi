@@ -29,7 +29,7 @@ public class InputFileReader {
         if (checkFileFormat(filePath)) {
             readFromFile(filePath, readPatients);
         } else {
-            throw new IllegalArgumentException("Bledny format pliku wejsciowego! Plik wejsciowy powinien byc zapisany w formacie \".txt\"");
+            throw new IllegalArgumentException("Bledny format pliku wejsciowego!\nPlik wejsciowy powinien byc zapisany w formacie \".txt\"");
         }
     }
 
@@ -42,7 +42,7 @@ public class InputFileReader {
         try {
             scanner = new Scanner(inputFile);
         } catch (FileNotFoundException e) {
-            throw new FileNotFoundException("Nie odnaleziono pliku: " + filePath +"! Podaj prawidlowa nazwe!");
+            throw new FileNotFoundException("Nie odnaleziono pliku: " + filePath +"!\nPodaj prawidlowa nazwe!");
         }
 
         if (scanner.hasNextLine()) {
@@ -71,12 +71,12 @@ public class InputFileReader {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym, linia: " + lineNumber + "!");
                             }
                         } else {
-                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "! Popraw strukture pliku!");
+                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "!\nPopraw strukture pliku!");
                         }
                     }
                 }
             } else {
-                throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe! Sprawdz poprawnosc danych w pliku wejsciowym!");
+                throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!");
             }
         } else {
             if (checkIfLineIsAComment(line, hospitalsComment)) {
@@ -103,12 +103,12 @@ public class InputFileReader {
                             }
 
                         } else {
-                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "! Popraw strukture pliku!");
+                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "!\nPopraw strukture pliku!");
                         }
                     }
                 }
             } else {
-                throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe! Sprawdz poprawnosc danych w pliku wejsciowym!");
+                throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!");
             }
 
             if (checkIfLineIsAComment(line, monumentsComment)) {
@@ -131,12 +131,12 @@ public class InputFileReader {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym, linia: " + lineNumber + "!");
                             }
                         } else {
-                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "! Popraw strukture pliku!");
+                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "!\nPopraw strukture pliku!");
                         }
                     }
                 }
             } else {
-                throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe! Sprawdz poprawnosc danych w pliku wejsciowym!");
+                throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!");
             }
 
             if (checkIfLineIsAComment(line, roadsComment)) {
@@ -159,12 +159,12 @@ public class InputFileReader {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym, linia: " + lineNumber + "!");
                             }
                         } else {
-                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "! Popraw strukture pliku!");
+                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "!\nPopraw strukture pliku!");
                         }
                     }
                 }
             } else {
-                throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe! Sprawdz poprawnosc danych w pliku wejsciowym!");
+                throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!");
             }
         }
     }
@@ -174,7 +174,7 @@ public class InputFileReader {
             if (line.equals(comment)) {
                 return true;
             } else {
-                throw new IllegalArgumentException("Linia z komenatrzem nie jest taka jak oczekiwano!");
+                throw new IllegalArgumentException("Linia z komentarzem nie jest taka jak oczekiwano!");
             }
         } else {
             return false;
