@@ -60,7 +60,7 @@
                         </VBox.margin>
                     </Slider>
                     <Region prefHeight="24.0" prefWidth="320.0"/>
-                    <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
+                    <Button fx:id="generateButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
                             onAction="#handleButtonClick" prefHeight="26.0" prefWidth="320.0"
                             text="Generuj rozwiązanie">
                         <font>

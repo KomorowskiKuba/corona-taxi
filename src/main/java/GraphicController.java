@@ -1,3 +1,5 @@
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,14 +13,13 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class GraphicController extends Application {
+    private final int MAX_MS_VALUE = 1000;
 
     @FXML
     private Pane pane;
@@ -34,6 +35,9 @@ public class GraphicController extends Application {
 
     @FXML
     private TextArea output;
+
+    @FXML
+    private Button generateButton;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -189,14 +193,33 @@ public class GraphicController extends Application {
         drawCountry(countryBorders);
         drawMap(roads, hospitals, monuments);
 
+        int duration = (int) (MAX_MS_VALUE * sliderValue);
+        System.out.println(duration);
+        Timeline timeLine = new Timeline();
+        timeLine.pause();
+        Collection<KeyFrame> frames = timeLine.getKeyFrames();
+        Duration frameGap = Duration.millis(duration);
+        Duration frameTime = Duration.millis(duration);
+
         for (Patient p : patients) {
-            Circle pInMap = drawPatient(p.getX(), p.getY());
-
-            //TODO Zaimplementować w jakiś sposób przerwę (Thread.sleep() najpierw robi przerwę
-            // dla wszystkich wywołań, a potem dopiero następuje rysuowanie wszystkego razem)
-
-            //pane.getChildren().remove(pInMap);
+            frameTime = frameTime.add(frameGap);
+            frames.add(new KeyFrame(frameTime, e -> {
+                Circle pInMap = drawPatient(p.getX(), p.getY());
+            }));
         }
+
+        timeLine.setCycleCount(Timeline.INDEFINITE);
+        timeLine.play();
+
+        generateButton.setOnAction(e -> {
+            timeLine.stop();
+            try {
+                handleButtonClick();
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        });
+        //pane.getChildren().remove(pInMap);
 
         for (Hospital h : hospitals) {
             output.appendText(h.toString() + "\n");
