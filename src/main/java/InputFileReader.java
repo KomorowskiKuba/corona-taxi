@@ -16,7 +16,7 @@ public class InputFileReader {
     private static List<Road> roadList;
     private static List<Patient> patientList;
 
-    public InputFileReader(String filePath, boolean readPatients) throws IllegalFormatException, FileNotFoundException {
+    public InputFileReader(String filePath, boolean readPatients) throws IllegalFormatException, FileNotFoundException, NullPointerException {
         hospitalList = new ArrayList<>();
         monumentList = new ArrayList<>();
         roadList = new ArrayList<>();
@@ -26,10 +26,20 @@ public class InputFileReader {
             throw new IllegalArgumentException("Nie podano nazwy pliku wejsciowego!");
         }
 
+        if (filePath.equals(".")) {
+            throw new IllegalArgumentException("Błędna nazwa pliku wejściowego!");
+        }
+
         if (checkFileFormat(filePath)) {
             readFromFile(filePath, readPatients);
         } else {
             throw new IllegalArgumentException("Bledny format pliku wejsciowego!\nPlik wejsciowy powinien byc zapisany w formacie \".txt\"");
+        }
+
+        if ((hospitalList.size() == 0 || monumentList.size() == 0 || roadList.size() == 0) && !readPatients) {
+            throw new NullPointerException("W pliku " + filePath + " brakuje danych!");
+        } else if (patientList.size() == 0 && readPatients) {
+            throw new NullPointerException("W pliku " + filePath + " brakuje danych!");
         }
     }
 
@@ -42,7 +52,7 @@ public class InputFileReader {
         try {
             scanner = new Scanner(inputFile);
         } catch (FileNotFoundException e) {
-            throw new FileNotFoundException("Nie odnaleziono pliku: " + filePath +"!\nPodaj prawidlowa nazwe!");
+            throw new FileNotFoundException("Nie odnaleziono pliku: " + filePath + "!\nPodaj prawidlowa nazwe!");
         }
 
         if (scanner.hasNextLine()) {
@@ -227,10 +237,9 @@ public class InputFileReader {
 
         try {
             ifr = new InputFileReader(location2, false);
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
         System.out.println("HOSPITALS: ");
         for (Hospital h : Objects.requireNonNull(ifr).getHospitalList()) {
             System.out.println(h.toString());
@@ -251,6 +260,5 @@ public class InputFileReader {
             System.out.println(p.toString());
         }
         System.out.println("===========================================");
-
     }
 }

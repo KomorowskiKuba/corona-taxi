@@ -1,5 +1,6 @@
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,9 +44,7 @@ public class GraphicController extends Application {
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("graphicController.fxml")));
         Scene scene = new Scene(root, 1280, 720);
-        //stage.getIcons().add(new Image("file::icon.png")); //nie dziala z jakiegos powodu
 
-        //Tak już działa, ale obrazek musi być w folderze resources
         stage.getIcons().add(new Image(GraphicController.class.getResourceAsStream("/icon.png")));
         stage.setResizable(false);
         stage.setTitle("Corona-taxi");
@@ -127,7 +126,7 @@ public class GraphicController extends Application {
     }
 
     private Circle drawPatient(double x, double y) {
-        Circle patient = new Circle(x + centerX, centerY - y, 2, Color.YELLOW);
+        Circle patient = new Circle(x + centerX, centerY - y, 2, Color.PURPLE);
         pane.getChildren().add(patient);
         return patient;
     }
@@ -153,21 +152,27 @@ public class GraphicController extends Application {
             reader = new InputFileReader(patPath, true);
             patients = Objects.requireNonNull(reader).getPatientList();
         } catch (FileNotFoundException e0) {
-            alert.setTitle("Błędna nazwa pliku");
+            alert.setTitle("Błędna nazwa pliku.");
             alert.setHeaderText("Błędna nazwa pliku!");
             alert.setContentText(e0.getMessage());
             alert.showAndWait();
             return;
         } catch (NumberFormatException e1) {
-            alert.setTitle("Niepoprawne dane");
+            alert.setTitle("Niepoprawne dane.");
             alert.setHeaderText("Niepoprawne dane!");
             alert.setContentText(e1.getMessage());
             alert.showAndWait();
             return;
         } catch (IllegalArgumentException e2) {
-            alert.setTitle("Błędny format pliku");
+            alert.setTitle("Błędny format pliku.");
             alert.setHeaderText("Błędny format pliku!");
             alert.setContentText(e2.getMessage());
+            alert.showAndWait();
+            return;
+        } catch (NullPointerException e3) {
+            alert.setTitle("Brak danych w pliku.");
+            alert.setHeaderText("Brak danych w pliku!");
+            alert.setContentText(e3.getMessage());
             alert.showAndWait();
             return;
         }
@@ -181,7 +186,7 @@ public class GraphicController extends Application {
         centerY = pane.getBoundsInLocal().getHeight() / 2;
 
         /*Tworzenie wielokąta.
-        Tablica współrzędnych typu Double, otrzymana z convex hull algorithm, opisująca granice kraju*/
+        ArrayLista typu Double, otrzymana z convex hull algorithm, opisująca granice kraju*/
         ArrayList<Double> countryBorders = new ArrayList<>(
                 Arrays.asList(10.0, 10.0,
                         -1.0, 50.0,
@@ -194,17 +199,33 @@ public class GraphicController extends Application {
         drawMap(roads, hospitals, monuments);
 
         int duration = (int) (MAX_MS_VALUE * sliderValue);
-        System.out.println(duration);
         Timeline timeLine = new Timeline();
         timeLine.pause();
         Collection<KeyFrame> frames = timeLine.getKeyFrames();
         Duration frameGap = Duration.millis(duration);
         Duration frameTime = Duration.millis(duration);
 
+        QuadTree qtree = new QuadTree();
+        Area quadrant = qtree.calcQuadrant(new ArrayList<>(hospitals));
+        qtree.fillTree(new ArrayList<>(hospitals), quadrant);
+
         for (Patient p : patients) {
             frameTime = frameTime.add(frameGap);
             frames.add(new KeyFrame(frameTime, e -> {
                 Circle pInMap = drawPatient(p.getX(), p.getY());
+                int nearestId = qtree.findNearest(p);
+                Hospital nearestHospital =  hospitals.get(nearestId);
+                TranslateTransition transition = new TranslateTransition();
+                transition.setDuration(Duration.millis(duration));
+                transition.setToX(nearestHospital.getX() - p.getX());
+                transition.setToY(-nearestHospital.getY() + p.getY());
+                transition.setNode(pInMap);
+
+                output.appendText("Patient " + p.getId() + " >> Hospital " + nearestId + "\n");
+
+                //TODO Tu zaimplementować Dijkstrę
+
+                transition.play();
             }));
         }
 
@@ -219,10 +240,5 @@ public class GraphicController extends Application {
                 exception.printStackTrace();
             }
         });
-        //pane.getChildren().remove(pInMap);
-
-        for (Hospital h : hospitals) {
-            output.appendText(h.toString() + "\n");
-        }
     }
 }

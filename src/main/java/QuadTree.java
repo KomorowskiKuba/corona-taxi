@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 enum direction {NE, SE, SW, NW}
 
 class Point {
@@ -158,32 +160,7 @@ public class QuadTree {
 
     private Node root;
 
-    public static void main(String[] args) {
-        QuadTree quadTree = new QuadTree();
-        Hospital[] vector = new Hospital[9];
-
-        //Wygląda to tragicznie, ale chciałem mieć dodawanie szpitali pod kontrolą,
-        // a nie chciało mi się pisać specjalnej metody do dodawania szpitali :p,
-        vector[0] = new Hospital(0, "0", -10, -10, 10, 10);
-        vector[1] = new Hospital(1, "1", -10, 10, 10, 10);
-        vector[2] = new Hospital(2, "2", 10, -10, 10, 10);
-        vector[3] = new Hospital(3, "3", 10, 10, 10, 10);
-        vector[4] = new Hospital(4, "4", 0, 0, 10, 10);
-        vector[5] = new Hospital(5, "5", 1, 3, 10, 10);
-        vector[6] = new Hospital(6, "6", 1, 1, 10, 10);
-        vector[7] = new Hospital(7, "7", 3, 3, 10, 10);
-        vector[8] = new Hospital(8, "8", 3, 1, 10, 10);
-
-        //Docelowo będzie przeszukiwać jedynie szpitale na obrzeżach zamiast wszystkich.
-        Area quadrant = quadTree.calcQuadrant(vector);
-        quadTree.fillTree(vector, quadrant);
-
-        Point patient = new Point(1, 4);
-        int nearestId = quadTree.findNearest(patient);
-        System.out.println("Punkt " + patient.toString() + ". Id najbliższego szpitala: " + nearestId);
-    }
-
-    public void fillTree(Hospital[] vector, Area quadrant) {
+    public void fillTree(ArrayList<Hospital> vector, Area quadrant) {
         for (Hospital x : vector) {
             Node child = new Node(x);
             root = put(root, child, quadrant);
@@ -201,7 +178,6 @@ public class QuadTree {
         return node;
     }
 
-    //Sprawdza w, którym kwadracie (NE, SE, SW, NW) umieścić dany węzeł.
     private direction checkDirection(Area quadrant, Point child) {
         float chX = child.getX();
         float chY = child.getY();
@@ -251,16 +227,15 @@ public class QuadTree {
         }
     }
 
-    //Szuka najbardziej skrajnych punktów i na ich podstawie tworzy prostokąt.
-    public Area calcQuadrant(Hospital[] vector) {
-        float xRight = vector[0].getX();
-        float xLeft = vector[0].getX();
-        float yLeft = vector[0].getY();
-        float yRight = vector[0].getY();
+    public Area calcQuadrant(ArrayList<Hospital> vector) {
+        int xRight = vector.get(0).getX();
+        int xLeft = vector.get(0).getX();
+        int yLeft = vector.get(0).getY();
+        int yRight = vector.get(0).getY();
 
-        for (int i = 1; i < vector.length; i++) {
-            float xCheck = vector[i].getX();
-            float yCheck = vector[i].getY();
+        for (int i = 1; i < vector.size(); i++) {
+            int xCheck = vector.get(i).getX();
+            int yCheck = vector.get(i).getY();
 
             if (xCheck > xRight) {
                 xRight = xCheck;
@@ -277,7 +252,6 @@ public class QuadTree {
         return new Area(xLeft, yLeft, xRight, yRight);
     }
 
-    //Przeszukuje quadTree
     private MyPair searchNode(Node node, Point patient, MyPair best) {
         if (node.getNe() != null) {
             MyPair temp = checkNeNeighbours(node.getNe(), patient, best.getDistance());
@@ -310,16 +284,18 @@ public class QuadTree {
         return best;
     }
 
-    //Zwraca parę(id, odległość) określającą najbliższy szpital.
-    public int findNearest(Point patient) {
-        Node firstNode = findFirst(root, patient);
-        float bestDistance = calcDistance(firstNode.getRepresentative(), patient);
+    public int findNearest(Patient patient) {
+        Point p = new Point(patient.getX(), patient.getY());
+        Node firstNode = findFirst(root, p);
+        float bestDistance = calcDistance(firstNode.getRepresentative(), p);
         MyPair pair = new MyPair(firstNode.getId(), bestDistance);
 
-        pair = searchNode(firstNode, patient, pair);
+        pair = searchNode(firstNode, p, pair);
 
-        return searchNode(root, patient, pair).getId();
+        return searchNode(root, p, pair).getId() - 1;
     }
+
+    private enum position {UP, DOWN, RIGHT, LEFT}
 
     private MyPair checkNeNeighbours(Node parent, Point patient, float bestDistance) {
         MyPair pair = checkBorderingNeighbour(parent.getSe(), patient, bestDistance, position.DOWN);
@@ -423,7 +399,6 @@ public class QuadTree {
         return new MyPair(id, bestDistance);
     }
 
-    //Sprawdzamy, do którego kwadratu trafiłby pacjent i wybieramy pierwszy znaleziony szpital na tym samym poziomie.
     private Node findFirst(Node node, Point patient) {
         Node parent = node;
         while (node != null) {
@@ -454,6 +429,4 @@ public class QuadTree {
 
         return (float) (Math.pow(xn - xp, 2) + Math.pow(yn - yp, 2));
     }
-
-    private enum position {UP, DOWN, RIGHT, LEFT}
 }
