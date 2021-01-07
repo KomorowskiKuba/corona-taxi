@@ -86,7 +86,7 @@ public class GraphicController extends Application {
 
         Polygon country = new Polygon();
         country.getPoints().addAll(countryBorders);
-        country.setFill(Color.AQUA);
+        country.setFill(Color.LIGHTGRAY);
         pane.getChildren().add(country);
     }
 
@@ -187,13 +187,8 @@ public class GraphicController extends Application {
 
         /*Tworzenie wielokąta.
         ArrayLista typu Double, otrzymana z convex hull algorithm, opisująca granice kraju*/
-        ArrayList<Double> countryBorders = new ArrayList<>(
-                Arrays.asList(10.0, 10.0,
-                        -1.0, 50.0,
-                        10.0, 140.0,
-                        120.0, 130.0,
-                        140.0, 10.0
-                ));
+        ConvexHull ch = new ConvexHull();
+        ArrayList<Double> countryBorders = ch.convex_hull(hospitals,monuments);
 
         drawCountry(countryBorders);
         drawMap(roads, hospitals, monuments);
