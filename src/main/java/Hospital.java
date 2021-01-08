@@ -18,6 +18,15 @@ public class Hospital extends MapObject {
         this.emptyBeds = freeBeds;
     }
 
+    public static Hospital findHospitalById(List<Hospital> hospitalList, int id) {
+        for (Hospital h : hospitalList) {
+            if (h.getId() == id) {
+                return h;
+            }
+        }
+        return null;
+    }
+
     public int bringPatient() {
         emptyBeds--;
         if (emptyBeds == 0) {

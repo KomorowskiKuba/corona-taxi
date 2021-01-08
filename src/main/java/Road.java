@@ -1,13 +1,13 @@
 public class Road {
     private final int id;
-    private final int firstHospitalId;
-    private final int secondHospitalId;
+    private Hospital firstHospital;
+    private Hospital secondHospital;
     private final int distance;
 
-    public Road(int id, int firstHospitalId, int secondHospitalId, int distance) {
+    public Road(int id, Hospital firstHospital, Hospital secondHospital, int distance) {
         this.id = id;
-        this.firstHospitalId = firstHospitalId;
-        this.secondHospitalId = secondHospitalId;
+        this.firstHospital = firstHospital;
+        this.secondHospital = secondHospital;
         this.distance = distance;
     }
 
@@ -15,15 +15,15 @@ public class Road {
     public String toString() {
         return "Road{" +
                 "id=" + id +
-                ", firstHospitalId=" + firstHospitalId +
-                ", secondHospitalId=" + secondHospitalId +
+                ", firstHospital=" + firstHospital +
+                ", secondHospital=" + secondHospital +
                 ", distance=" + distance +
                 '}';
     }
 
-    public int getFirstHospitalId() { return firstHospitalId; }
+    public int getFirstHospitalId() { return firstHospital.getId(); }
 
     public int getSecondHospitalId() {
-        return secondHospitalId;
+        return secondHospital.getId();
     }
 }

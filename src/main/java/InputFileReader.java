@@ -164,7 +164,10 @@ public class InputFileReader {
                                 int secondHospitalId = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
                                 int distance = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
 
-                                roadList.add(new Road(roadId, firstHospitalId, secondHospitalId, distance));
+                                Hospital firstHospital = Hospital.findHospitalById(hospitalList, firstHospitalId);
+                                Hospital secondHospital = Hospital.findHospitalById(hospitalList, secondHospitalId);
+
+                                roadList.add(new Road(roadId, firstHospital, secondHospital, distance));
                             } catch (NumberFormatException nfe) {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym, linia: " + lineNumber + "!");
                             }
@@ -181,7 +184,7 @@ public class InputFileReader {
 
     private static boolean checkIfLineIsAComment(String line, String comment) {
         if (line.charAt(0) == '#') {
-            if (line.equals(comment)) {
+            if (line.equals(line)) { //TODO: CHANGE THIS
                 return true;
             } else {
                 throw new IllegalArgumentException("Linia z komentarzem nie jest taka jak oczekiwano!");
