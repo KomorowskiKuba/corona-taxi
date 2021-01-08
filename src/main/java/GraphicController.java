@@ -1,4 +1,5 @@
 import javafx.animation.KeyFrame;
+import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
@@ -201,26 +202,73 @@ public class GraphicController extends Application {
         Duration frameTime = Duration.millis(duration);
 
         QuadTree qtree = new QuadTree();
+        DijkstrasAlgorithm dijkstrasAlgorithm = new DijkstrasAlgorithm(hospitals);
         Area quadrant = qtree.calcQuadrant(new ArrayList<>(hospitals));
         qtree.fillTree(new ArrayList<>(hospitals), quadrant);
 
         for (Patient p : patients) {
             frameTime = frameTime.add(frameGap);
             frames.add(new KeyFrame(frameTime, e -> {
+                boolean shouldPlay = true;
                 Circle pInMap = drawPatient(p.getX(), p.getY());
                 int nearestId = qtree.findNearest(p);
                 Hospital nearestHospital =  hospitals.get(nearestId);
-                TranslateTransition transition = new TranslateTransition();
-                transition.setDuration(Duration.millis(duration));
-                transition.setToX(nearestHospital.getX() - p.getX());
-                transition.setToY(-nearestHospital.getY() + p.getY());
-                transition.setNode(pInMap);
 
-                output.appendText("Patient " + p.getId() + " >> Hospital " + nearestId + "\n");
+                TranslateTransition transitionToNearest = new TranslateTransition();
+                List<TranslateTransition> transitions = new ArrayList<>();
+                SequentialTransition transition = new SequentialTransition();
 
-                //TODO Tu zaimplementować Dijkstrę
+                transitionToNearest.setDuration(Duration.millis(duration));
+                transitionToNearest.setToX(nearestHospital.getX() - p.getX());
+                transitionToNearest.setToY(-nearestHospital.getY() + p.getY());
+                transitionToNearest.setNode(pInMap);
+                transitions.add(transitionToNearest);
 
-                transition.play();
+                if (nearestHospital.getEmptyBeds() == 0) {
+                    Hospital nearestAndEmptyHospital = dijkstrasAlgorithm.getNearestEmpty(nearestHospital);
+
+                    if (nearestAndEmptyHospital != null) {
+                        List<Hospital> path = nearestAndEmptyHospital.getShortestPath();
+                        TranslateTransition transitionToNext = new TranslateTransition();
+
+                        for (Hospital h : path) {
+                            if (h.getId() != nearestHospital.getId()) { //TODO: CHANGE FOR EQUALS MAYBE
+                                transitionToNext.setDuration(Duration.millis(duration));
+                                transitionToNext.setToX(h.getX() - p.getX());
+                                transitionToNext.setToY(-h.getY() + p.getY());
+                                transitionToNext.setNode(pInMap);
+                                transitions.add(transitionToNext);
+
+                                output.appendText("Patient " + p.getId() + " >> Hospital " + h.getId() + "\n");
+                            }
+                        }
+
+                        TranslateTransition transitionToFinal = new TranslateTransition();
+
+                        transitionToFinal.setDuration(Duration.millis(duration));
+                        transitionToFinal.setToX(nearestAndEmptyHospital.getX() - p.getX());
+                        transitionToFinal.setToY(-nearestAndEmptyHospital.getY() + p.getY());
+                        transitionToFinal.setNode(pInMap);
+                        transitions.add(transitionToFinal);
+
+                        nearestAndEmptyHospital.bringPatient();
+
+                        output.appendText("Patient " + p.getId() + " >> Hospital " + nearestAndEmptyHospital.getId() + "\n");
+
+
+                    } else {
+                        shouldPlay = false;
+                        output.appendText("All hospitals are full! Patient " + p.getId() + " couldn't be transported to hospital! :(");
+                    }
+                } else {
+                    output.appendText("Patient " + p.getId() + " >> Hospital " + (nearestId + 1) + "\n");
+                    nearestHospital.bringPatient();
+                }
+
+                if (shouldPlay) {
+                    transition.getChildren().addAll(transitions);
+                    transition.play();
+                }
             }));
         }
 
