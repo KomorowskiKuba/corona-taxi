@@ -167,6 +167,9 @@ public class InputFileReader {
                                 Hospital firstHospital = Hospital.findHospitalById(hospitalList, firstHospitalId);
                                 Hospital secondHospital = Hospital.findHospitalById(hospitalList, secondHospitalId);
 
+                                Objects.requireNonNull(firstHospital).addDestination(secondHospital, distance);
+                                Objects.requireNonNull(secondHospital).addDestination(firstHospital, distance);
+
                                 roadList.add(new Road(roadId, firstHospital, secondHospital, distance));
                             } catch (NumberFormatException nfe) {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym, linia: " + lineNumber + "!");
