@@ -1,91 +1,32 @@
 import java.util.*;
 
-class GraphNode {
-    private final int id;
-    private boolean isEmpty;
-    private int distance = Integer.MAX_VALUE;
-    private List<GraphNode> shortestPath = new LinkedList<>();
-    private final Map<GraphNode, Integer> adjacentNodeMap = new HashMap<>();
-
-    public GraphNode(int id, boolean isEmpty) {
-        this.id = id;
-        this.isEmpty = isEmpty;
-    }
-
-    public void addDestination(GraphNode destination, int distance) {
-        adjacentNodeMap.put(destination, distance);
-    }
-
-    public int getDistance() {
-        return distance;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public boolean isEmpty() {
-        return isEmpty;
-    }
-
-    public Map<GraphNode, Integer> getAdjacentNodeMap() {
-        return adjacentNodeMap;
-    }
-
-    public List<GraphNode> getShortestPath() {
-        return shortestPath;
-    }
-
-    public void setShortestPath(List<GraphNode> shortestPath) {
-        this.shortestPath = shortestPath;
-    }
-
-    public void setEmpty(boolean empty) {
-        isEmpty = empty;
-    }
-
-    public void setDistance(int distance) {
-        this.distance = distance;
-    }
-
-    @Override
-    public String toString() {
-        return "GraphNode{" +
-                "id=" + id +
-                ", shortestPath=" + shortestPath +
-                ", distance=" + distance +
-                ", isEmpty=" + isEmpty +
-                '}';
-    }
-}
-
 class Graph {
-    private final Set<GraphNode> nodeSet = new HashSet<>();
+    private final Set<Hospital> nodeSet = new HashSet<>();
 
-    public void addNode(GraphNode node) {
+    public void addNode(Hospital node) {
         nodeSet.add(node);
     }
 
-    public Set<GraphNode> getNodes() {
+    public Set<Hospital> getNodes() {
         return nodeSet;
     }
 }
 
 public class DijkstrasAlgorithm {
-    public static void calculateShortestPathFromNode(Graph graph, GraphNode node) {
-        Set<GraphNode> settledNodes = new HashSet<>();
-        Set<GraphNode> unsettledNodes = new HashSet<>();
+    public static void calculateShortestPathFromNode(Graph graph, Hospital node) {
+        Set<Hospital> settledNodes = new HashSet<>();
+        Set<Hospital> unsettledNodes = new HashSet<>();
 
         node.setDistance(0);
         unsettledNodes.add(node);
 
         while (unsettledNodes.size() != 0) {
-            GraphNode currentNode = getLowestDistanceNode(unsettledNodes);
+            Hospital currentNode = getLowestDistanceNode(unsettledNodes);
             unsettledNodes.remove(currentNode);
 
-            for (Map.Entry<GraphNode, Integer> pair : currentNode.getAdjacentNodeMap().entrySet()) {
+            for (Map.Entry<Hospital, Integer> pair : currentNode.getAdjacentNodeMap().entrySet()) {
                 int edgeDistance = pair.getValue();
-                GraphNode adjNode = pair.getKey();
+                Hospital adjNode = pair.getKey();
 
                 if (!settledNodes.contains(adjNode)) {
                     calculateMinDistance(adjNode, edgeDistance, currentNode);
@@ -97,11 +38,11 @@ public class DijkstrasAlgorithm {
 
     }
 
-    private static GraphNode getLowestDistanceNode(Set<GraphNode> unsettledNodes) {
-        GraphNode lowestDistanceNode = null;
+    private static Hospital getLowestDistanceNode(Set<Hospital> unsettledNodes) {
+        Hospital lowestDistanceNode = null;
         int lowestDistance = Integer.MAX_VALUE;
 
-        for (GraphNode node : unsettledNodes) {
+        for (Hospital node : unsettledNodes) {
             if (node.getDistance() < lowestDistance) {
                 lowestDistanceNode = node;
                 lowestDistance = node.getDistance();
@@ -111,27 +52,27 @@ public class DijkstrasAlgorithm {
         return lowestDistanceNode;
     }
 
-    private static void calculateMinDistance(GraphNode evaluationNode, int distance, GraphNode source) {
+    private static void calculateMinDistance(Hospital evaluationNode, int distance, Hospital source) {
         int srcDistance = source.getDistance();
 
         if (srcDistance + distance < evaluationNode.getDistance()) {
             evaluationNode.setDistance(srcDistance + distance);
-            LinkedList<GraphNode> shortestPath = new LinkedList<>(source.getShortestPath());
+            LinkedList<Hospital> shortestPath = new LinkedList<>(source.getShortestPath());
             shortestPath.add(source);
             evaluationNode.setShortestPath(shortestPath);
         }
     }
 
-    public static GraphNode getNearestEmpty(Graph graph, GraphNode node) {
-        GraphNode nearestAndEmpty = null;
+    public static Hospital getNearestEmpty(Graph graph, Hospital node) {
+        Hospital nearestAndEmpty = null;
         int distance = Integer.MAX_VALUE;
 
         calculateShortestPathFromNode(graph, node);
 
-        for (GraphNode gn : graph.getNodes()) {
-            if (gn.getDistance() < distance && gn.getDistance() != 0 && gn.isEmpty()) {
-                distance = gn.getDistance();
-                nearestAndEmpty = gn;
+        for (Hospital n : graph.getNodes()) {
+            if (n.getDistance() < distance /*&& n.getDistance() != 0*/ && n.getEmptyBeds() > 0) {
+                distance = n.getDistance();
+                nearestAndEmpty = n;
             }
         }
 
@@ -141,21 +82,22 @@ public class DijkstrasAlgorithm {
     public static void main(String[] args) {
         Graph graph = new Graph();
 
-        GraphNode node1 = new GraphNode(1, true);
-        GraphNode node2 = new GraphNode(2, false);
-        GraphNode node3 = new GraphNode(3, true);
-        GraphNode node4 = new GraphNode(4, true);
-        GraphNode node5 = new GraphNode(5, true);
-        GraphNode node6 = new GraphNode(6, true);
+        Hospital node1 = new Hospital(1, "Hospital1", 1,1, 100, 0);
+        Hospital node2 = new Hospital(2, "Hospital2", 2,2, 100, 0);
+        Hospital node3 = new Hospital(3, "Hospital3", 3,3, 100, 0);
+        Hospital node4 = new Hospital(4, "Hospital4", 4,4, 100, 0);
+        Hospital node5 = new Hospital(5, "Hospital5", 5,5, 100, 0);
+        Hospital node6 = new Hospital(6, "Hospital6", 6,6, 100, 100);
 
-        node1.addDestination(node2, 8);
-        node1.addDestination(node3, 14);
-        node2.addDestination(node4, 13);
+
+        node1.addDestination(node2, 10);
+        node1.addDestination(node3, 15);
+        node2.addDestination(node4, 12);
         node2.addDestination(node6, 15);
-        node3.addDestination(node5, 9);
-        node4.addDestination(node5, 3);
-        node4.addDestination(node6, 2);
-        node6.addDestination(node5, 4);
+        node3.addDestination(node5, 10);
+        node4.addDestination(node5, 2);
+        node4.addDestination(node6, 1);
+        node6.addDestination(node5, 5);
 
         graph.addNode(node1);
         graph.addNode(node2);
@@ -164,6 +106,10 @@ public class DijkstrasAlgorithm {
         graph.addNode(node5);
         graph.addNode(node6);
 
+        System.out.println("XDDD");
+        System.out.println("XDDDDDDDDDDDDDDDDDDD");
+        System.out.println(graph.getNodes().toString());
+        System.out.println();
         System.out.println(getNearestEmpty(graph, node1).toString());
 
         //DijkstrasAlgorithm.calculateShortestPathFromNode(graph, nodeA);

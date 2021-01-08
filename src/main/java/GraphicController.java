@@ -224,7 +224,7 @@ public class GraphicController extends Application {
             }));
         }
 
-        timeLine.setCycleCount(Timeline.INDEFINITE);
+        timeLine.setCycleCount(1);
         timeLine.play();
 
         generateButton.setOnAction(e -> {
