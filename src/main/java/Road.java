@@ -21,9 +21,9 @@ public class Road {
                 '}';
     }
 
-    public int getFirstHospitalId() { return firstHospital.getId(); }
+    public Hospital getFirstHospital() { return firstHospital; }
 
-    public int getSecondHospitalId() {
-        return secondHospital.getId();
+    public Hospital getSecondHospital() {
+        return secondHospital;
     }
 }

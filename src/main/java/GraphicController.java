@@ -97,8 +97,8 @@ public class GraphicController extends Application {
         pane.getChildren().add(center);
 
         for (Road road : roads) {
-            Hospital hospital1 = hospitals.get(road.getFirstHospitalId() - 1);
-            Hospital hospital2 = hospitals.get(road.getSecondHospitalId() - 1);
+            Hospital hospital1 = hospitals.get(road.getFirstHospital().getId() - 1);
+            Hospital hospital2 = hospitals.get(road.getSecondHospital().getId() - 1);
             int x1 = hospital1.getX();
             int y1 = hospital1.getY();
             int x2 = hospital2.getX();
