@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 class Coordinates implements Comparable<Coordinates> {
     int x;
@@ -21,19 +19,25 @@ class Coordinates implements Comparable<Coordinates> {
 
 public class ConvexHull {
 
-    public static long cross(Coordinates O, Coordinates A, Coordinates B) {
-        return (A.x - O.x) * (long) (B.y - O.y) - (A.y - O.y) * (long) (B.x - O.x);
+    public static int orientation(Coordinates p, Coordinates q, Coordinates r) {
+        int val = (q.y - p.y) * (r.x - q.x) -
+                (q.x - p.x) * (r.y - q.y);
+
+        if (val == 0) return 0;
+        return (val > 0) ? 1 : 2;
     }
 
-    public ArrayList<Double> convex_hull(List<Hospital> hospitalList, List<Monument> monumentList) {
-        Coordinates[] coordinatesArray = new Coordinates[hospitalList.size() + monumentList.size()];
+    public static ArrayList<Double> convex_hull(List<Hospital> hospitalList, List<Monument> monumentList) {
+        ArrayList<Double> toReturn = new ArrayList<>();
+        int n = hospitalList.size() + monumentList.size();
+        Coordinates[] points = new Coordinates[n];
         int counter = 0;
 
         for (int i = 0; i < hospitalList.size(); i++) {
             Coordinates point = new Coordinates();
             point.x = hospitalList.get(i).getX();
             point.y = hospitalList.get(i).getY();
-            coordinatesArray[i] = point;
+            points[i] = point;
             counter++;
         }
 
@@ -41,69 +45,34 @@ public class ConvexHull {
             Coordinates point = new Coordinates();
             point.x = monumentList.get(i).getX();
             point.y = monumentList.get(i).getY();
-            coordinatesArray[counter++] = point;
+            points[counter++] = point;
         }
 
-        int n = coordinatesArray.length, k = 0;
-        Coordinates[] H = new Coordinates[2 * n];
+        Vector<Coordinates> hull = new Vector<Coordinates>();
 
-        Arrays.sort(coordinatesArray);
+        int l = 0;
+        for (int i = 1; i < n; i++)
+            if (points[i].x < points[l].x)
+                l = i;
 
-        for (int i = 0; i < n; ++i) {
-            while (k >= 2 && cross(H[k - 2], H[k - 1], coordinatesArray[i]) <= 0)
-                k--;
-            H[k++] = coordinatesArray[i];
-        }
+        int p = l, q;
+        do {
+            hull.add(points[p]);
+            q = (p + 1) % n;
 
-        for (int i = n - 2, t = k + 1; i >= 0; i--) {
-            while (k >= t && cross(H[k - 2], H[k - 1], coordinatesArray[i]) <= 0)
-                k--;
-            H[k++] = coordinatesArray[i];
-        }
-        if (k > 1) {
-            H = Arrays.copyOfRange(H, 0, k - 1); // remove non-hull vertices after k; remove k - 1 which is a duplicate
-        }
-        ArrayList<Double> toReturn = new ArrayList<>();
-        for (int i = 0; i < H.length; i++) {
-            toReturn.add((double) H[i].x);
-            toReturn.add((double) H[i].y);
+            for (int i = 0; i < n; i++) {
+                if (orientation(points[p], points[i], points[q])
+                        == 2)
+                    q = i;
+            }
+            p = q;
+
+        } while (p != l);
+
+        for (Coordinates tmp : hull) {
+            toReturn.add((double)tmp.x);
+            toReturn.add((double)tmp.y);
         }
         return toReturn;
-    }
-
-    public boolean isInBorder(ArrayList<Double> borders, Point patient) {
-        int pos = 0;
-        int neg = 0;
-
-        for (int i = 0; i < borders.size(); i += 2) {
-            if (patient.getX() == borders.get(i) && patient.getY() == borders.get(i + 1)) {
-                return true;
-            }
-
-            double x1 = borders.get(i);
-            double y1 = borders.get(i + 1);
-
-            int j = i < borders.size() - 1 ? i + 1 : 0;
-
-            double x2 = borders.get(j);
-            double y2 = borders.get(j + 1);
-
-            double x = patient.getX();
-            double y = patient.getY();
-
-            double crossProduct = (x - x1) * (y2 - y1) - (x2 - x1) * (y - y1);
-
-            if (crossProduct > 0) {
-                pos++;
-            }
-            if (crossProduct < 0) {
-                neg++;
-            }
-
-            if (pos > 0 && neg > 0) {
-                return false;
-            }
-        }
-        return true;
     }
 }
