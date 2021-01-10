@@ -18,10 +18,15 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 public class GraphicController extends Application {
     private final int MAX_MS_VALUE = 1000;
+    private double centerX;
+    private double centerY;
 
     @FXML
     private Pane pane;
@@ -46,7 +51,7 @@ public class GraphicController extends Application {
         Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("graphicController.fxml")));
         Scene scene = new Scene(root, 1280, 720);
 
-        stage.getIcons().add(new Image(GraphicController.class.getResourceAsStream("/icon.png")));
+        stage.getIcons().add(new Image(GraphicController.class.getResourceAsStream("/images/icon.png")));
         stage.setResizable(false);
         stage.setTitle("Corona-taxi");
         stage.setScene(scene);
@@ -64,18 +69,15 @@ public class GraphicController extends Application {
         dialogPane.getStylesheets().add(getClass().getResource("alert.css").toExternalForm());
         dialogPane.getStyleClass().add("alert");
         Stage stage = (Stage) dialogPane.getScene().getWindow();
-        stage.getIcons().add(new Image("icon.png"));
+        stage.getIcons().add(new Image("images/icon.png"));
 
         return alert;
     }
 
-    double centerX;
-    double centerY;
-
     //Rysuje wielokąt na podstawie otrzymanych punktów.
-    private void drawCountry(ArrayList<Double> countryBorders) {
+    private void drawCountry(ArrayList<Double> countryBorders, double scale) {
         for (int i = 0; i < countryBorders.size(); i++) {
-            double prevValue = countryBorders.get(i);
+            double prevValue = countryBorders.get(i) / scale;
             double value;
             if (i % 2 == 0) {
                 value = prevValue + centerX;
@@ -92,17 +94,17 @@ public class GraphicController extends Application {
     }
 
     //Umieszcza na mapie elementy.
-    private void drawMap(List<Road> roads, List<Hospital> hospitals, List<Monument> monuments) {
+    private void drawMap(List<Road> roads, List<Hospital> hospitals, List<Monument> monuments, double scale) {
         Circle center = new Circle(centerX, centerY, 2, Color.BLACK);
         pane.getChildren().add(center);
 
         for (Road road : roads) {
             Hospital hospital1 = hospitals.get(road.getFirstHospital().getId() - 1);
             Hospital hospital2 = hospitals.get(road.getSecondHospital().getId() - 1);
-            int x1 = hospital1.getX();
-            int y1 = hospital1.getY();
-            int x2 = hospital2.getX();
-            int y2 = hospital2.getY();
+            double x1 = hospital1.getX() / scale;
+            double y1 = hospital1.getY() / scale;
+            double x2 = hospital2.getX() / scale;
+            double y2 = hospital2.getY() / scale;
 
             Line line = new Line(centerX + x1, centerY - y1, centerX + x2, centerY - y2);
             line.setStroke(Color.BLACK);
@@ -110,26 +112,37 @@ public class GraphicController extends Application {
         }
 
         for (Hospital h : hospitals) {
-            int x = h.getX();
-            int y = h.getY();
+            double x = h.getX() / scale;
+            double y = h.getY() / scale;
 
             Circle hospital = new Circle(x + centerX, centerY - y, 4, Color.RED);
             pane.getChildren().add(hospital);
         }
 
         for (Monument m : monuments) {
-            int x = m.getX();
-            int y = m.getY();
+            double x = m.getX() / scale;
+            double y = m.getY() / scale;
 
             Circle monument = new Circle(x + centerX, centerY - y, 3, Color.GRAY);
             pane.getChildren().add(monument);
         }
     }
 
-    private Circle drawPatient(double x, double y) {
-        Circle patient = new Circle(x + centerX, centerY - y, 2, Color.PURPLE);
+    private Circle drawPatient(double x, double y, double scale) {
+        Circle patient = new Circle(x / scale + centerX, centerY - y / scale, 2, Color.PURPLE);
         pane.getChildren().add(patient);
         return patient;
+    }
+
+    private double calcScale(Area borders) {
+        double scale = 1;
+        while (Math.abs(borders.getxLeft() - borders.getxRight()) / scale > 464 || Math.abs(borders.getyUp() - borders.getyDown()) / scale > 344) {
+            scale++;
+        }
+        while (Math.abs(borders.getxLeft() - borders.getxRight()) / scale < 100 || Math.abs(borders.getyUp() - borders.getyDown()) / scale < 100) {
+            scale /= 2;
+        }
+        return scale;
     }
 
     public void handleButtonClick() {
@@ -189,10 +202,14 @@ public class GraphicController extends Application {
         /*Tworzenie wielokąta.
         ArrayLista typu Double, otrzymana z convex hull algorithm, opisująca granice kraju*/
         ConvexHull ch = new ConvexHull();
-        ArrayList<Double> countryBorders = ch.convex_hull(hospitals,monuments);
+        ArrayList<Double> countryBorders = ch.convex_hull(hospitals, monuments);
 
-        drawCountry(countryBorders);
-        drawMap(roads, hospitals, monuments);
+        QuadTree qtree = new QuadTree();
+        Area quadrant = qtree.calcQuadrant(countryBorders);
+        double scale = calcScale(quadrant);
+
+        drawCountry(countryBorders, scale);
+        drawMap(roads, hospitals, monuments, scale);
 
         int duration = (int) (MAX_MS_VALUE * sliderValue);
         Timeline timeLine = new Timeline();
@@ -201,26 +218,24 @@ public class GraphicController extends Application {
         Duration frameGap = Duration.millis(duration);
         Duration frameTime = Duration.millis(duration);
 
-        QuadTree qtree = new QuadTree();
-        DijkstrasAlgorithm dijkstrasAlgorithm = new DijkstrasAlgorithm(hospitals);
-        Area quadrant = qtree.calcQuadrant(new ArrayList<>(hospitals));
         qtree.fillTree(new ArrayList<>(hospitals), quadrant);
+        DijkstrasAlgorithm dijkstrasAlgorithm = new DijkstrasAlgorithm(hospitals);
 
         for (Patient p : patients) {
             frameTime = frameTime.add(frameGap);
             frames.add(new KeyFrame(frameTime, e -> {
                 boolean shouldPlay = true;
-                Circle pInMap = drawPatient(p.getX(), p.getY());
+                Circle pInMap = drawPatient(p.getX(), p.getY(), scale);
                 int nearestId = qtree.findNearest(p);
-                Hospital nearestHospital =  hospitals.get(nearestId);
+                Hospital nearestHospital = hospitals.get(nearestId);
 
                 TranslateTransition transitionToNearest = new TranslateTransition();
                 List<TranslateTransition> transitions = new ArrayList<>();
                 SequentialTransition transition = new SequentialTransition();
 
                 transitionToNearest.setDuration(Duration.millis(duration));
-                transitionToNearest.setToX(nearestHospital.getX() - p.getX());
-                transitionToNearest.setToY(-nearestHospital.getY() + p.getY());
+                transitionToNearest.setToX((double) (nearestHospital.getX() - p.getX()) / scale);
+                transitionToNearest.setToY((double) (-nearestHospital.getY() + p.getY()) / scale);
                 transitionToNearest.setNode(pInMap);
                 transitions.add(transitionToNearest);
 
@@ -234,8 +249,8 @@ public class GraphicController extends Application {
                         for (Hospital h : path) {
                             if (h.getId() != nearestHospital.getId()) { //TODO: CHANGE FOR EQUALS MAYBE
                                 transitionToNext.setDuration(Duration.millis(duration));
-                                transitionToNext.setToX(h.getX() - p.getX());
-                                transitionToNext.setToY(-h.getY() + p.getY());
+                                transitionToNext.setToX((double) (h.getX() - p.getX()) / scale);
+                                transitionToNext.setToY((double) (-h.getY() + p.getY()) / scale);
                                 transitionToNext.setNode(pInMap);
                                 transitions.add(transitionToNext);
 
@@ -246,8 +261,8 @@ public class GraphicController extends Application {
                         TranslateTransition transitionToFinal = new TranslateTransition();
 
                         transitionToFinal.setDuration(Duration.millis(duration));
-                        transitionToFinal.setToX(nearestAndEmptyHospital.getX() - p.getX());
-                        transitionToFinal.setToY(-nearestAndEmptyHospital.getY() + p.getY());
+                        transitionToFinal.setToX((double) (nearestAndEmptyHospital.getX() - p.getX()) / scale);
+                        transitionToFinal.setToY((double) (-nearestAndEmptyHospital.getY() + p.getY()) / scale);
                         transitionToFinal.setNode(pInMap);
                         transitions.add(transitionToFinal);
 

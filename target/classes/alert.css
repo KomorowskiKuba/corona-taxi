@@ -2,7 +2,6 @@
     -fx-border-color: red;
 }
 
-/**Costumization of The Bar where the buttons are located**/
 .dialog-pane > .button-bar > .container {
     -fx-background-color: red;
 }
@@ -15,7 +14,6 @@
     -fx-font-weight: bold;
 }
 
-/**Costumization of DialogPane Header**/
 .dialog-pane > .header-panel {
     -fx-background-color: red;
 }
@@ -28,7 +26,6 @@
     -fx-font-weight: bold;
 }
 
-/**Costumization of Buttons**/
 .dialog-pane .button {
     -fx-background-color: red;
     -fx-text-fill: white;

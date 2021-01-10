@@ -3,19 +3,19 @@ import java.util.ArrayList;
 enum direction {NE, SE, SW, NW}
 
 class Point {
-    private final float x;
-    private final float y;
+    private final double x;
+    private final double y;
 
-    public Point(float x, float y) {
+    public Point(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    public float getX() {
+    public double getX() {
         return x;
     }
 
-    public float getY() {
+    public double getY() {
         return y;
     }
 
@@ -27,14 +27,14 @@ class Point {
 
 class MyPair {
     private final int id;
-    private final float distance;
+    private final double distance;
 
-    public MyPair(int id, float distance) {
+    public MyPair(int id, double distance) {
         this.id = id;
         this.distance = distance;
     }
 
-    public float getDistance() {
+    public double getDistance() {
         return distance;
     }
 
@@ -104,12 +104,12 @@ class Node {
 }
 
 class Area {
-    private final float xLeft;
-    private final float xRight;
-    private final float yDown;
-    private final float yUp;
+    private final double xLeft;
+    private final double xRight;
+    private final double yDown;
+    private final double yUp;
 
-    public Area(float xLeft, float yDown, float xRight, float yUp) {
+    public Area(double xLeft, double yDown, double xRight, double yUp) {
         if (xLeft >= xRight) {
             throw new IllegalArgumentException("xLeft should be lesser than xRight");
         } else if (yDown >= yUp) {
@@ -122,8 +122,8 @@ class Area {
     }
 
     public Area getQuadrant(direction direction) {
-        float quadrantWidth = (xRight - xLeft) / 2;
-        float quadrantHeight = (yUp - yDown) / 2;
+        double quadrantWidth = (xRight - xLeft) / 2;
+        double quadrantHeight = (yUp - yDown) / 2;
 
         switch (direction) {
             case NE:
@@ -139,19 +139,19 @@ class Area {
         }
     }
 
-    public float getyUp() {
+    public double getyUp() {
         return yUp;
     }
 
-    public float getyDown() {
+    public double getyDown() {
         return yDown;
     }
 
-    public float getxRight() {
+    public double getxRight() {
         return xRight;
     }
 
-    public float getxLeft() {
+    public double getxLeft() {
         return xLeft;
     }
 }
@@ -179,16 +179,16 @@ public class QuadTree {
     }
 
     private direction checkDirection(Area quadrant, Point child) {
-        float chX = child.getX();
-        float chY = child.getY();
+        double chX = child.getX();
+        double chY = child.getY();
 
-        float xRight = quadrant.getxRight();
-        float xLeft = quadrant.getxLeft();
-        float yUp = quadrant.getyUp();
-        float yDown = quadrant.getyDown();
+        double xRight = quadrant.getxRight();
+        double xLeft = quadrant.getxLeft();
+        double yUp = quadrant.getyUp();
+        double yDown = quadrant.getyDown();
 
-        float centX = xLeft + (xRight - xLeft) / 2;
-        float centY = yDown + (yUp - yDown) / 2;
+        double centX = xLeft + (xRight - xLeft) / 2;
+        double centY = yDown + (yUp - yDown) / 2;
 
         if (chX >= centX) {
             if (chY >= centY) {
@@ -227,15 +227,15 @@ public class QuadTree {
         }
     }
 
-    public Area calcQuadrant(ArrayList<Hospital> vector) {
-        int xRight = vector.get(0).getX();
-        int xLeft = vector.get(0).getX();
-        int yLeft = vector.get(0).getY();
-        int yRight = vector.get(0).getY();
+    public Area calcQuadrant(ArrayList<Double> vector) {
+        double xRight = vector.get(0);
+        double xLeft = vector.get(0);
+        double yLeft = vector.get(1);
+        double yRight = vector.get(1);
 
-        for (int i = 1; i < vector.size(); i++) {
-            int xCheck = vector.get(i).getX();
-            int yCheck = vector.get(i).getY();
+        for (int i = 2; i < vector.size(); i += 2) {
+            double xCheck = vector.get(i);
+            double yCheck = vector.get(i + 1);
 
             if (xCheck > xRight) {
                 xRight = xCheck;
@@ -284,53 +284,62 @@ public class QuadTree {
         return best;
     }
 
+    private MyPair searchRoot (Point patient, MyPair best) {
+        double rootDistance = calcDistance(patient, root.getRepresentative());
+        if (rootDistance < best.getDistance()) {
+               return new MyPair(root.getId(), rootDistance);
+        }
+        return best;
+    }
+
     public int findNearest(Patient patient) {
         Point p = new Point(patient.getX(), patient.getY());
         Node firstNode = findFirst(root, p);
-        float bestDistance = calcDistance(firstNode.getRepresentative(), p);
+        double bestDistance = calcDistance(firstNode.getRepresentative(), p);
         MyPair pair = new MyPair(firstNode.getId(), bestDistance);
 
         pair = searchNode(firstNode, p, pair);
+        pair = searchRoot(p, pair);
 
         return searchNode(root, p, pair).getId() - 1;
     }
 
     private enum position {UP, DOWN, RIGHT, LEFT}
 
-    private MyPair checkNeNeighbours(Node parent, Point patient, float bestDistance) {
+    private MyPair checkNeNeighbours(Node parent, Point patient, double bestDistance) {
         MyPair pair = checkBorderingNeighbour(parent.getSe(), patient, bestDistance, position.DOWN);
         pair = checkBorderingNeighbour(parent.getNw(), patient, pair.getDistance(), position.LEFT);
         pair = checkDiagonalNeighbour(parent.getSw(), patient, pair.getDistance(), direction.SW);
         return pair;
     }
 
-    private MyPair checkSeNeighbours(Node parent, Point patient, float bestDistance) {
+    private MyPair checkSeNeighbours(Node parent, Point patient, double bestDistance) {
         MyPair pair = checkBorderingNeighbour(parent.getNe(), patient, bestDistance, position.UP);
         pair = checkBorderingNeighbour(parent.getSe(), patient, pair.getDistance(), position.LEFT);
         pair = checkDiagonalNeighbour(parent.getNw(), patient, pair.getDistance(), direction.NW);
         return pair;
     }
 
-    private MyPair checkSWNeighbours(Node parent, Point patient, float bestDistance) {
+    private MyPair checkSWNeighbours(Node parent, Point patient, double bestDistance) {
         MyPair pair = checkBorderingNeighbour(parent.getNw(), patient, bestDistance, position.UP);
         pair = checkBorderingNeighbour(parent.getSe(), patient, pair.getDistance(), position.LEFT);
         pair = checkDiagonalNeighbour(parent.getNe(), patient, pair.getDistance(), direction.NW);
         return pair;
     }
 
-    private MyPair checkNwNeighbours(Node parent, Point patient, float bestDistance) {
+    private MyPair checkNwNeighbours(Node parent, Point patient, double bestDistance) {
         MyPair pair = checkBorderingNeighbour(parent.getNe(), patient, bestDistance, position.UP);
         pair = checkBorderingNeighbour(parent.getSw(), patient, pair.getDistance(), position.LEFT);
         pair = checkDiagonalNeighbour(parent.getSe(), patient, pair.getDistance(), direction.NW);
         return pair;
     }
 
-    private MyPair checkBorderingNeighbour(Node quadrant, Point patient, float bestDistance, position pos) {
-        float checkedDistance;
+    private MyPair checkBorderingNeighbour(Node quadrant, Point patient, double bestDistance, position pos) {
+        double checkedDistance;
         int id = -1;
         if (quadrant != null) {
-            float yBorder = -1;
-            float xBorder = -1;
+            double yBorder = -1;
+            double xBorder = -1;
             if (pos.equals(position.DOWN)) {
                 yBorder = quadrant.getQuadrant().getyUp();
             } else if (pos.equals(position.UP)) {
@@ -344,7 +353,7 @@ public class QuadTree {
             switch (pos) {
                 case UP:
                 case DOWN:
-                    if ((float) Math.pow(yBorder - patient.getY(), 2) < bestDistance) {
+                    if (Math.pow(yBorder - patient.getY(), 2) < bestDistance) {
                         checkedDistance = calcDistance(quadrant.getRepresentative(), patient);
                         if (checkedDistance < bestDistance) {
                             bestDistance = checkedDistance;
@@ -354,7 +363,7 @@ public class QuadTree {
                     }
                 case RIGHT:
                 case LEFT:
-                    if ((float) Math.pow(xBorder - patient.getX(), 2) < bestDistance) {
+                    if (Math.pow(xBorder - patient.getX(), 2) < bestDistance) {
                         checkedDistance = calcDistance(quadrant.getRepresentative(), patient);
                         if (checkedDistance < bestDistance) {
                             bestDistance = checkedDistance;
@@ -367,9 +376,9 @@ public class QuadTree {
         return new MyPair(id, bestDistance);
     }
 
-    private MyPair checkDiagonalNeighbour(Node quadrant, Point patient, float bestDistance, direction drc) {
+    private MyPair checkDiagonalNeighbour(Node quadrant, Point patient, double bestDistance, direction drc) {
         int id = -1;
-        float checkedDistance;
+        double checkedDistance;
         if (quadrant != null) {
             Point corner = null;
             switch (drc) {
@@ -421,12 +430,12 @@ public class QuadTree {
         return parent;
     }
 
-    private float calcDistance(Point neighbour, Point patient) {
-        float xn = neighbour.getX();
-        float yn = neighbour.getY();
-        float xp = patient.getX();
-        float yp = patient.getY();
+    private double calcDistance(Point neighbour, Point patient) {
+        double xn = neighbour.getX();
+        double yn = neighbour.getY();
+        double xp = patient.getX();
+        double yp = patient.getY();
 
-        return (float) (Math.pow(xn - xp, 2) + Math.pow(yn - yp, 2));
+        return (Math.pow(xn - xp, 2) + Math.pow(yn - yp, 2));
     }
 }
