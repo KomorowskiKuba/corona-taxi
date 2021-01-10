@@ -1,4 +1,6 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 class Coordinates implements Comparable<Coordinates> {
     int x;
@@ -70,9 +72,45 @@ public class ConvexHull {
         } while (p != l);
 
         for (Coordinates tmp : hull) {
-            toReturn.add((double)tmp.x);
-            toReturn.add((double)tmp.y);
+            toReturn.add((double) tmp.x);
+            toReturn.add((double) tmp.y);
         }
         return toReturn;
+    }
+
+    public static boolean isInBorder(ArrayList<Double> borders, Point patient) {
+        int pos = 0;
+        int neg = 0;
+
+        for (int i = 0; i < borders.size(); i += 2) {
+            if (patient.getX() == borders.get(i) && patient.getY() == borders.get(i + 1)) {
+                return true;
+            }
+
+            double x = patient.getX();
+            double y = patient.getY();
+
+            double x1 = borders.get(i);
+            double y1 = borders.get(i + 1);
+
+            int j = i < borders.size() - 2 ? i + 2 : 0;
+
+            double x2 = borders.get(j);
+            double y2 = borders.get(j + 1);
+
+            double crossProduct = (x - x1) * (y2 - y1) - (x2 - x1) * (y - y1);
+
+            if (crossProduct > 0) {
+                pos++;
+            }
+            if (crossProduct < 0) {
+                neg++;
+            }
+
+            if (pos > 0 && neg > 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

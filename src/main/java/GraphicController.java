@@ -1,7 +1,4 @@
-import javafx.animation.KeyFrame;
-import javafx.animation.SequentialTransition;
-import javafx.animation.Timeline;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -199,10 +196,7 @@ public class GraphicController extends Application {
         centerX = pane.getBoundsInLocal().getWidth() / 2;
         centerY = pane.getBoundsInLocal().getHeight() / 2;
 
-        /*Tworzenie wielokąta.
-        ArrayLista typu Double, otrzymana z convex hull algorithm, opisująca granice kraju*/
-        ConvexHull ch = new ConvexHull();
-        ArrayList<Double> countryBorders = ch.convex_hull(hospitals, monuments);
+        ArrayList<Double> countryBorders = ConvexHull.convex_hull(hospitals, monuments);
 
         QuadTree qtree = new QuadTree();
         Area quadrant = qtree.calcQuadrant(countryBorders);
@@ -222,10 +216,23 @@ public class GraphicController extends Application {
         DijkstrasAlgorithm dijkstrasAlgorithm = new DijkstrasAlgorithm(hospitals);
 
         for (Patient p : patients) {
+            Point point = new Point(p.getX() + centerX, -p.getY() + centerY);
+
             frameTime = frameTime.add(frameGap);
             frames.add(new KeyFrame(frameTime, e -> {
                 boolean shouldPlay = true;
                 Circle pInMap = drawPatient(p.getX(), p.getY(), scale);
+
+                if (!ConvexHull.isInBorder(countryBorders, point)) {
+                    output.appendText("Patient " + p.getId() + " is outside the country.\n");
+                    FadeTransition fade = new FadeTransition();
+                    fade.setDuration(Duration.millis(duration));
+                    fade.setToValue(0);
+                    fade.setNode(pInMap);
+                    fade.play();
+                    return;
+                }
+
                 int nearestId = qtree.findNearest(p);
                 Hospital nearestHospital = hospitals.get(nearestId);
 
