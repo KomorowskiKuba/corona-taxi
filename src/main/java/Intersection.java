@@ -90,26 +90,27 @@ public class Intersection {
     }
 
     static double[] findCrossPoint(Point a, Point b, Point c, Point d) {
-        double xa = a.x;
-        double ya = a.y;
-        double xb = b.x;
-        double yb = b.y;
-        double xc = c.x;
-        double yc = c.y;
-        double xd = d.x;
-        double yd = d.y;
-        double a1 = ya - yb;
-        double b1 = xb - xa;
-        double c1 = xa * yb - xb * ya;
-        double a2 = yc - yd;
-        double b2 = xd - xc;
-        double c2 = xc * yd - xd * yc;
-        double w = a1 * b2 - a2 * b1;
-        double wx = (-c1) * b2 + c2 * b1;
-        double wy = a1 * (-c2) + a2 * c1;
-        double x = wx / w;
-        double y = wy / w;
+        double xa,ya,xb,yb,xc,yc,xd,yd,a1,b1,c1,a2,b2,c2,w,wx,wy,x,y;
         double[] crossPoint = new double[2];
+        xa = a.x;
+        ya = a.y;
+        xb = b.x;
+        yb = b.y;
+        xc = c.x;
+        yc = c.y;
+        xd = d.x;
+        yd = d.y;
+        a1 = ya - yb;
+        b1 = xb - xa;
+        c1 = xa * yb - xb * ya;
+        a2 = yc - yd;
+        b2 = xd - xc;
+        c2 = xc * yd - xd * yc;
+        w = a1 * b2 - a2 * b1;
+        wx = (-c1) * b2 + c2 * b1;
+        wy = a1 * (-c2) + a2 * c1;
+        x = wx / w;
+        y = wy / w;
         crossPoint[0] = x;
         crossPoint[1] = y;
         return crossPoint;
