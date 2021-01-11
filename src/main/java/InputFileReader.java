@@ -15,13 +15,16 @@ public class InputFileReader {
     private static List<Monument> monumentList;
     private static List<Road> roadList;
     private static List<Patient> patientList;
+    private static List<Hospital> hospitalAndIntersectionList;
 
+    public InputFileReader(){
+    }
     public InputFileReader(String filePath, boolean readPatients) throws IllegalFormatException, FileNotFoundException, NullPointerException {
         hospitalList = new ArrayList<>();
         monumentList = new ArrayList<>();
         roadList = new ArrayList<>();
         patientList = new ArrayList<>();
-
+        hospitalAndIntersectionList = new ArrayList<>();
         if (filePath.isEmpty()) {
             throw new IllegalArgumentException("Nie podano nazwy pliku wejsciowego!");
         }
@@ -41,6 +44,9 @@ public class InputFileReader {
         } else if (patientList.size() == 0 && readPatients) {
             throw new NullPointerException("W pliku " + filePath + " brakuje danych!");
         }
+        initializeHospitalAndIntersectionList();
+        Intersection intersection = new Intersection();
+        intersection.findIntersections(hospitalList, hospitalAndIntersectionList, roadList);
     }
 
     private static void readFromFile(String filePath, boolean readPatients) throws FileNotFoundException {
@@ -117,6 +123,7 @@ public class InputFileReader {
                         }
                     }
                 }
+
             } else {
                 throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!");
             }
@@ -226,6 +233,10 @@ public class InputFileReader {
         return patientList;
     }
 
+    public List<Hospital> getHospitalAndIntersectionList() {
+        return hospitalAndIntersectionList;
+    }
+
     private boolean checkFileFormat(String fileName) {
         StringTokenizer stringTokenizer = new StringTokenizer(fileName, ".");
         List<String> tokens = new ArrayList<>();
@@ -266,5 +277,11 @@ public class InputFileReader {
             System.out.println(p.toString());
         }
         System.out.println("===========================================");
+    }
+
+    private void initializeHospitalAndIntersectionList() {
+        for (int i = 0; i < hospitalList.size(); i++) {
+            hospitalAndIntersectionList.add(hospitalList.get(i));
+        }
     }
 }

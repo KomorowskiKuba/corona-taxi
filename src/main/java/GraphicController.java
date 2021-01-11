@@ -91,13 +91,13 @@ public class GraphicController extends Application {
     }
 
     //Umieszcza na mapie elementy.
-    private void drawMap(List<Road> roads, List<Hospital> hospitals, List<Monument> monuments, double scale) {
+    private void drawMap(List<Road> roads, List<Hospital> hospitals, List<Hospital> hospitalsAndIntersections, List<Monument> monuments, double scale) {
         Circle center = new Circle(centerX, centerY, 2, Color.BLACK);
         pane.getChildren().add(center);
 
         for (Road road : roads) {
-            Hospital hospital1 = hospitals.get(road.getFirstHospital().getId() - 1);
-            Hospital hospital2 = hospitals.get(road.getSecondHospital().getId() - 1);
+            Hospital hospital1 = hospitalsAndIntersections.get(road.getFirstHospital().getId() - 1);
+            Hospital hospital2 = hospitalsAndIntersections.get(road.getSecondHospital().getId() - 1);
             double x1 = hospital1.getX() / scale;
             double y1 = hospital1.getY() / scale;
             double x2 = hospital2.getX() / scale;
@@ -153,13 +153,13 @@ public class GraphicController extends Application {
         List<Monument> monuments;
         List<Road> roads;
         List<Patient> patients;
-
+        List<Hospital> hospitalsAndIntersections;
         try {
             reader = new InputFileReader(hospPath, false);
             hospitals = Objects.requireNonNull(reader).getHospitalList();
             monuments = Objects.requireNonNull(reader).getMonumentList();
             roads = Objects.requireNonNull(reader).getRoadList();
-
+            hospitalsAndIntersections = Objects.requireNonNull(reader).getHospitalAndIntersectionList();
             reader = new InputFileReader(patPath, true);
             patients = Objects.requireNonNull(reader).getPatientList();
         } catch (FileNotFoundException e0) {
@@ -203,7 +203,7 @@ public class GraphicController extends Application {
         double scale = calcScale(quadrant);
 
         drawCountry(countryBorders, scale);
-        drawMap(roads, hospitals, monuments, scale);
+        drawMap(roads, hospitals, hospitalsAndIntersections, monuments, scale);
 
         int duration = (int) (MAX_MS_VALUE * sliderValue);
         Timeline timeLine = new Timeline();
@@ -213,7 +213,7 @@ public class GraphicController extends Application {
         Duration frameTime = Duration.millis(duration);
 
         qtree.fillTree(new ArrayList<>(hospitals), quadrant);
-        DijkstrasAlgorithm dijkstrasAlgorithm = new DijkstrasAlgorithm(hospitals);
+        DijkstrasAlgorithm dijkstrasAlgorithm = new DijkstrasAlgorithm(hospitalsAndIntersections);
 
         for (Patient p : patients) {
             Point point = new Point(p.getX() + centerX, -p.getY() + centerY);

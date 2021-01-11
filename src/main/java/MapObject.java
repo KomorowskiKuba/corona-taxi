@@ -1,9 +1,9 @@
 public abstract class MapObject {
-    private final int x;
-    private final int y;
+    private final double x;
+    private final double y;
     private final int id;
 
-    MapObject(int id, int x, int y) {
+    MapObject(int id, double x, double y) {
         this.id = id;this.x = x;
         this.y = y;
     }
@@ -12,11 +12,11 @@ public abstract class MapObject {
         return id;
     }
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 

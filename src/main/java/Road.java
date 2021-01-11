@@ -1,10 +1,12 @@
+import java.util.List;
+
 public class Road {
     private final int id;
     private Hospital firstHospital;
     private Hospital secondHospital;
-    private final int distance;
+    private final double distance;
 
-    public Road(int id, Hospital firstHospital, Hospital secondHospital, int distance) {
+    public Road(int id, Hospital firstHospital, Hospital secondHospital, double distance) {
         this.id = id;
         this.firstHospital = firstHospital;
         this.secondHospital = secondHospital;
@@ -15,8 +17,8 @@ public class Road {
     public String toString() {
         return "Road{" +
                 "id=" + id +
-                ", firstHospital=" + firstHospital +
-                ", secondHospital=" + secondHospital +
+                ", firstHospital=" + firstHospital.getId() +
+                ", secondHospital=" + secondHospital.getId() +
                 ", distance=" + distance +
                 '}';
     }
@@ -25,5 +27,13 @@ public class Road {
 
     public Hospital getSecondHospital() {
         return secondHospital;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public double getDistance() {
+        return distance;
     }
 }

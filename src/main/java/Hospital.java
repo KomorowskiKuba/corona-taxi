@@ -11,7 +11,7 @@ public class Hospital extends MapObject {
     private List<Hospital> shortestPath = new LinkedList<>();
     private final Map<Hospital, Integer> adjacentHospitalsMap = new HashMap<>();
 
-    public Hospital(int id, String name, int x, int y, int totBeds, int freeBeds) {
+    public Hospital(int id, String name, double x, double y, int totBeds, int freeBeds) {
         super(id, x, y);
         this.name = name;
         this.totalBeds = totBeds;
@@ -22,6 +22,17 @@ public class Hospital extends MapObject {
         for (Hospital h : hospitalList) {
             if (h.getId() == id) {
                 return h;
+            }
+        }
+        return null;
+    }
+
+    public static Hospital findHospitalByCoordinates(List<Hospital> hospitalList, double x, double y) {
+        for (Hospital h : hospitalList) {
+            if (h.getX() == x) {
+                if (h.getY() == y){
+                    return h;
+                }
             }
         }
         return null;
