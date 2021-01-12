@@ -85,6 +85,7 @@ public class Hospital extends MapObject {
                 "totalBeds=" + totalBeds +
                 ", emptyBeds=" + emptyBeds +
                 ", name='" + name + '\'' +
+                ", distance=" + distance +
                 '}';
     }
 }

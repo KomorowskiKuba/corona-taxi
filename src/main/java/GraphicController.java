@@ -15,10 +15,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class GraphicController extends Application {
     private final int MAX_MS_VALUE = 1000;
@@ -250,15 +247,17 @@ public class GraphicController extends Application {
                 List<TranslateTransition> transitions = new ArrayList<>();
                 SequentialTransition transition = new SequentialTransition();
                 makeTransition(scale, duration, p, pInMap, nearestHospital, transitions);
+                output.appendText("Patient " + p.getId() + " >> Hospital " + (nearestId + 1) + "\n");
 
                 if (nearestHospital.getEmptyBeds() == 0) {
                     Hospital nearestAndEmptyHospital = dijkstrasAlgorithm.getNearestEmpty(nearestHospital);
 
                     if (nearestAndEmptyHospital != null) {
-                        List<Hospital> path = nearestAndEmptyHospital.getShortestPath();
+                        List<Hospital> path = nearestHospital.getShortestPath();
+                        Collections.reverse(path);
 
                         for (Hospital h : path) {
-                            if (h.getId() != nearestHospital.getId()) {
+                            if (h.getId() != nearestHospital.getId()) { //TODO: CHANGE FOR EQUALS
                                 makeTransition(scale, duration, p, pInMap, h, transitions);
                                 output.appendText("Patient " + p.getId() + " >> Hospital " + h.getId() + "\n");
                             }
@@ -273,7 +272,6 @@ public class GraphicController extends Application {
                         output.appendText("All hospitals are full! Patient " + p.getId() + " couldn't be transported to hospital! :(\n");
                     }
                 } else {
-                    output.appendText("Patient " + p.getId() + " >> Hospital " + (nearestId + 1) + "\n");
                     nearestHospital.bringPatient();
                 }
 

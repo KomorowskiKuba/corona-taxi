@@ -29,7 +29,11 @@ public class DijkstrasAlgorithm {
         return graph;
     }
 
-    public static void calculateShortestPathFromNode(Hospital node) {
+    public Graph getGraph() {
+        return graph;
+    }
+
+    public static void calculateShortestPathsFromNode(Hospital node) {
         Set<Hospital> settledNodes = new HashSet<>();
         Set<Hospital> unsettledNodes = new HashSet<>();
 
@@ -83,10 +87,10 @@ public class DijkstrasAlgorithm {
         Hospital nearestAndEmpty = null;
         int distance = Integer.MAX_VALUE;
 
-        calculateShortestPathFromNode(node);
+        calculateShortestPathsFromNode(node);
 
         for (Hospital n : graph.getNodes()) {
-            if (n.getDistance() < distance && n.getEmptyBeds() > 0) {
+            if (n.getDistance() < distance&& n.getEmptyBeds() > 0) {
                 distance = n.getDistance();
                 nearestAndEmpty = n;
             }
@@ -131,7 +135,7 @@ public class DijkstrasAlgorithm {
 
         //for (GraphNode n : graph.getNodes()) {
         //    System.out.println("ID: " + n.getId() + " " + n.getDistance() + " " + n.isEmpty());
-            //System.out.println(n.toString());
+        //System.out.println(n.toString());
         //}
     }
 }

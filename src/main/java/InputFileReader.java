@@ -1,3 +1,5 @@
+import javafx.util.Pair;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -82,7 +84,7 @@ public class InputFileReader {
                                 int id = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
                                 int x = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
                                 int y = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
-                                patientList.add(new Patient(id, x, y));
+                                patientList.add(new Patient(id, x, y, false));
                             } catch (NumberFormatException nfe) {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym, linia: " + lineNumber + "!");
                             }
