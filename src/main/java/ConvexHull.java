@@ -37,16 +37,16 @@ public class ConvexHull {
 
         for (int i = 0; i < hospitalList.size(); i++) {
             Coordinates point = new Coordinates();
-            point.x = hospitalList.get(i).getX();
-            point.y = hospitalList.get(i).getY();
+            point.x = (int) hospitalList.get(i).getX();
+            point.y = (int) hospitalList.get(i).getY();
             points[i] = point;
             counter++;
         }
 
         for (int i = 0; i < monumentList.size(); i++) {
             Coordinates point = new Coordinates();
-            point.x = monumentList.get(i).getX();
-            point.y = monumentList.get(i).getY();
+            point.x = (int) monumentList.get(i).getX();
+            point.y = (int) monumentList.get(i).getY();
             points[counter++] = point;
         }
 
