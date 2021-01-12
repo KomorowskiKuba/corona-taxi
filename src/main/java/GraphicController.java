@@ -133,13 +133,24 @@ public class GraphicController extends Application {
 
     private double calcScale(Area borders) {
         double scale = 1;
+        boolean incrScale = false;
         while (Math.abs(borders.getxLeft() - borders.getxRight()) / scale > 464 || Math.abs(borders.getyUp() - borders.getyDown()) / scale > 344) {
             scale++;
+            incrScale = true;
         }
-        while (Math.abs(borders.getxLeft() - borders.getxRight()) / scale < 100 || Math.abs(borders.getyUp() - borders.getyDown()) / scale < 100) {
+        while ((Math.abs(borders.getxLeft() - borders.getxRight()) / scale < 100 || Math.abs(borders.getyUp() - borders.getyDown()) / scale < 100) && !incrScale) {
             scale /= 2;
         }
         return scale;
+    }
+
+    private void makeTransition(double scale, int duration, Patient p, Circle pInMap, Hospital nearestHospital, List<TranslateTransition> transitions) {
+        TranslateTransition transition = new TranslateTransition();
+        transition.setDuration(Duration.millis(duration));
+        transition.setToX((nearestHospital.getX() - p.getX()) / scale);
+        transition.setToY((-nearestHospital.getY() + p.getY()) / scale);
+        transition.setNode(pInMap);
+        transitions.add(transition);
     }
 
     public void handleButtonClick() {
@@ -236,51 +247,30 @@ public class GraphicController extends Application {
                 int nearestId = qtree.findNearest(p);
                 Hospital nearestHospital = hospitals.get(nearestId);
 
-                TranslateTransition transitionToNearest = new TranslateTransition();
                 List<TranslateTransition> transitions = new ArrayList<>();
                 SequentialTransition transition = new SequentialTransition();
-
-                transitionToNearest.setDuration(Duration.millis(duration));
-                transitionToNearest.setToX((double) (nearestHospital.getX() - p.getX()) / scale);
-                transitionToNearest.setToY((double) (-nearestHospital.getY() + p.getY()) / scale);
-                transitionToNearest.setNode(pInMap);
-                transitions.add(transitionToNearest);
+                makeTransition(scale, duration, p, pInMap, nearestHospital, transitions);
 
                 if (nearestHospital.getEmptyBeds() == 0) {
                     Hospital nearestAndEmptyHospital = dijkstrasAlgorithm.getNearestEmpty(nearestHospital);
 
                     if (nearestAndEmptyHospital != null) {
                         List<Hospital> path = nearestAndEmptyHospital.getShortestPath();
-                        TranslateTransition transitionToNext = new TranslateTransition();
 
                         for (Hospital h : path) {
-                            if (h.getId() != nearestHospital.getId()) { //TODO: CHANGE FOR EQUALS MAYBE
-                                transitionToNext.setDuration(Duration.millis(duration));
-                                transitionToNext.setToX((double) (h.getX() - p.getX()) / scale);
-                                transitionToNext.setToY((double) (-h.getY() + p.getY()) / scale);
-                                transitionToNext.setNode(pInMap);
-                                transitions.add(transitionToNext);
-
+                            if (h.getId() != nearestHospital.getId()) {
+                                makeTransition(scale, duration, p, pInMap, h, transitions);
                                 output.appendText("Patient " + p.getId() + " >> Hospital " + h.getId() + "\n");
                             }
                         }
 
-                        TranslateTransition transitionToFinal = new TranslateTransition();
-
-                        transitionToFinal.setDuration(Duration.millis(duration));
-                        transitionToFinal.setToX((double) (nearestAndEmptyHospital.getX() - p.getX()) / scale);
-                        transitionToFinal.setToY((double) (-nearestAndEmptyHospital.getY() + p.getY()) / scale);
-                        transitionToFinal.setNode(pInMap);
-                        transitions.add(transitionToFinal);
-
+                        makeTransition(scale, duration, p, pInMap, nearestAndEmptyHospital, transitions);
                         nearestAndEmptyHospital.bringPatient();
-
                         output.appendText("Patient " + p.getId() + " >> Hospital " + nearestAndEmptyHospital.getId() + "\n");
-
 
                     } else {
                         shouldPlay = false;
-                        output.appendText("All hospitals are full! Patient " + p.getId() + " couldn't be transported to hospital! :(");
+                        output.appendText("All hospitals are full! Patient " + p.getId() + " couldn't be transported to hospital! :(\n");
                     }
                 } else {
                     output.appendText("Patient " + p.getId() + " >> Hospital " + (nearestId + 1) + "\n");

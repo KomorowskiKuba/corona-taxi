@@ -159,6 +159,7 @@ class Area {
 public class QuadTree {
 
     private Node root;
+    private MyPair best;
 
     public void fillTree(ArrayList<Hospital> vector, Area quadrant) {
         for (Hospital x : vector) {
@@ -252,91 +253,86 @@ public class QuadTree {
         return new Area(xLeft, yLeft, xRight, yRight);
     }
 
-    private MyPair searchNode(Node node, Point patient, MyPair best) {
+    private void searchNode(Node node, Point patient) {
         if (node.getNe() != null) {
-            MyPair temp = checkNeNeighbours(node.getNe(), patient, best.getDistance());
-            if (temp.getId() != -1) {
-                best = temp;
-                searchNode(node.getNe(), patient, best);
+            if (checkNeNeighbours(node.getNe(), patient)) {
+                searchNode(node.getNe(), patient);
             }
         }
         if (node.getSe() != null) {
-            MyPair temp = checkSeNeighbours(node.getSe(), patient, best.getDistance());
-            if (temp.getId() != -1) {
-                best = temp;
-                searchNode(node.getSe(), patient, best);
+            if (checkSeNeighbours(node.getSe(), patient)) {
+                searchNode(node.getSe(), patient);
             }
         }
         if (node.getSw() != null) {
-            MyPair temp = checkSWNeighbours(node.getSw(), patient, best.getDistance());
-            if (temp.getId() != -1) {
-                best = temp;
-                searchNode(node.getSw(), patient, best);
+            if (checkSwNeighbours(node.getSw(), patient)) {
+                searchNode(node.getSw(), patient);
             }
         }
         if (node.getNw() != null) {
-            MyPair temp = checkNwNeighbours(node.getNw(), patient, best.getDistance());
-            if (temp.getId() != -1) {
-                best = temp;
-                searchNode(node.getNw(), patient, best);
+            if (checkNwNeighbours(node.getNw(), patient)) {
+                searchNode(node.getNw(), patient);
             }
         }
-        return best;
     }
 
-    private MyPair searchRoot (Point patient, MyPair best) {
+    private void searchRoot(Point patient) {
         double rootDistance = calcDistance(patient, root.getRepresentative());
         if (rootDistance < best.getDistance()) {
-               return new MyPair(root.getId(), rootDistance);
+            best = new MyPair(root.getId(), rootDistance);
         }
-        return best;
     }
 
     public int findNearest(Patient patient) {
         Point p = new Point(patient.getX(), patient.getY());
         Node firstNode = findFirst(root, p);
         double bestDistance = calcDistance(firstNode.getRepresentative(), p);
-        MyPair pair = new MyPair(firstNode.getId(), bestDistance);
+        best = new MyPair(firstNode.getId(), bestDistance);
 
-        pair = searchNode(firstNode, p, pair);
-        pair = searchRoot(p, pair);
+        searchRoot(p);
+        searchNode(firstNode, p);
+        searchNode(root, p);
 
-        return searchNode(root, p, pair).getId() - 1;
+        return best.getId() - 1;
     }
 
     private enum position {UP, DOWN, RIGHT, LEFT}
 
-    private MyPair checkNeNeighbours(Node parent, Point patient, double bestDistance) {
-        MyPair pair = checkBorderingNeighbour(parent.getSe(), patient, bestDistance, position.DOWN);
-        pair = checkBorderingNeighbour(parent.getNw(), patient, pair.getDistance(), position.LEFT);
-        pair = checkDiagonalNeighbour(parent.getSw(), patient, pair.getDistance(), direction.SW);
-        return pair;
+    private boolean checkNeNeighbours(Node parent, Point patient) {
+        boolean neNode = checkDiagonalNeighbour(parent, patient, direction.NE);
+        boolean seNode = checkBorderingNeighbour(parent.getSe(), patient, position.DOWN);
+        boolean nwNode = checkBorderingNeighbour(parent.getNw(), patient, position.LEFT);
+        boolean swNode = checkDiagonalNeighbour(parent.getSw(), patient, direction.SW);
+        return neNode || seNode || nwNode || swNode;
     }
 
-    private MyPair checkSeNeighbours(Node parent, Point patient, double bestDistance) {
-        MyPair pair = checkBorderingNeighbour(parent.getNe(), patient, bestDistance, position.UP);
-        pair = checkBorderingNeighbour(parent.getSe(), patient, pair.getDistance(), position.LEFT);
-        pair = checkDiagonalNeighbour(parent.getNw(), patient, pair.getDistance(), direction.NW);
-        return pair;
+    private boolean checkSeNeighbours(Node parent, Point patient) {
+        boolean neNode = checkBorderingNeighbour(parent.getNe(), patient, position.UP);
+        boolean seNode = checkDiagonalNeighbour(parent, patient, direction.SE);
+        boolean swNode = checkBorderingNeighbour(parent.getSw(), patient, position.LEFT);
+        boolean nwNode = checkDiagonalNeighbour(parent.getNw(), patient, direction.NW);
+        return neNode || seNode || swNode || nwNode;
     }
 
-    private MyPair checkSWNeighbours(Node parent, Point patient, double bestDistance) {
-        MyPair pair = checkBorderingNeighbour(parent.getNw(), patient, bestDistance, position.UP);
-        pair = checkBorderingNeighbour(parent.getSe(), patient, pair.getDistance(), position.LEFT);
-        pair = checkDiagonalNeighbour(parent.getNe(), patient, pair.getDistance(), direction.NW);
-        return pair;
+    private boolean checkSwNeighbours(Node parent, Point patient) {
+        boolean neNode = checkDiagonalNeighbour(parent.getNe(), patient, direction.NE);
+        boolean seNode = checkBorderingNeighbour(parent.getSe(), patient, position.LEFT);
+        boolean swNode = checkDiagonalNeighbour(parent, patient, direction.SW);
+        boolean nwNode = checkBorderingNeighbour(parent.getNw(), patient, position.UP);
+        return neNode || seNode || swNode || nwNode;
     }
 
-    private MyPair checkNwNeighbours(Node parent, Point patient, double bestDistance) {
-        MyPair pair = checkBorderingNeighbour(parent.getNe(), patient, bestDistance, position.UP);
-        pair = checkBorderingNeighbour(parent.getSw(), patient, pair.getDistance(), position.LEFT);
-        pair = checkDiagonalNeighbour(parent.getSe(), patient, pair.getDistance(), direction.NW);
-        return pair;
+    private boolean checkNwNeighbours(Node parent, Point patient) {
+        boolean neNode = checkBorderingNeighbour(parent.getNe(), patient, position.RIGHT);
+        boolean seNode = checkDiagonalNeighbour(parent.getSe(), patient, direction.SE);
+        boolean swNode = checkBorderingNeighbour(parent.getSw(), patient, position.DOWN);
+        boolean nwNode = checkDiagonalNeighbour(parent, patient, direction.NW);
+        return neNode || seNode || swNode || nwNode;
     }
 
-    private MyPair checkBorderingNeighbour(Node quadrant, Point patient, double bestDistance, position pos) {
+    private boolean checkBorderingNeighbour(Node quadrant, Point patient, position pos) {
         double checkedDistance;
-        int id = -1;
+        boolean isTooFar = true;
         if (quadrant != null) {
             double yBorder = -1;
             double xBorder = -1;
@@ -353,32 +349,32 @@ public class QuadTree {
             switch (pos) {
                 case UP:
                 case DOWN:
-                    if (Math.pow(yBorder - patient.getY(), 2) < bestDistance) {
+                    if (Math.pow(yBorder - patient.getY(), 2) < best.getDistance()) {
                         checkedDistance = calcDistance(quadrant.getRepresentative(), patient);
-                        if (checkedDistance < bestDistance) {
-                            bestDistance = checkedDistance;
-                            id = quadrant.getId();
+                        if (checkedDistance < best.getDistance()) {
+                            best = new MyPair(quadrant.getId(), checkedDistance);
+                            isTooFar = false;
                             break;
                         }
                     }
                 case RIGHT:
                 case LEFT:
-                    if (Math.pow(xBorder - patient.getX(), 2) < bestDistance) {
+                    if (Math.pow(xBorder - patient.getX(), 2) < best.getDistance()) {
                         checkedDistance = calcDistance(quadrant.getRepresentative(), patient);
-                        if (checkedDistance < bestDistance) {
-                            bestDistance = checkedDistance;
-                            id = quadrant.getId();
+                        if (checkedDistance < best.getDistance()) {
+                            best = new MyPair(quadrant.getId(), checkedDistance);
+                            isTooFar = false;
                             break;
                         }
                     }
             }
         }
-        return new MyPair(id, bestDistance);
+        return isTooFar;
     }
 
-    private MyPair checkDiagonalNeighbour(Node quadrant, Point patient, double bestDistance, direction drc) {
-        int id = -1;
+    private boolean checkDiagonalNeighbour(Node quadrant, Point patient, direction drc) {
         double checkedDistance;
+        boolean isTooFar = true;
         if (quadrant != null) {
             Point corner = null;
             switch (drc) {
@@ -396,16 +392,15 @@ public class QuadTree {
                     break;
             }
 
-            if (calcDistance(corner, patient) < bestDistance) {
+            if (calcDistance(corner, patient) < best.getDistance()) {
                 checkedDistance = calcDistance(quadrant.getRepresentative(), patient);
-                if (checkedDistance < bestDistance) {
-                    bestDistance = checkedDistance;
-                    id = quadrant.getId();
-                    return new MyPair(id, bestDistance);
+                if (checkedDistance < best.getDistance()) {
+                    best = new MyPair(quadrant.getId(), checkedDistance);
+                    isTooFar = false;
                 }
             }
         }
-        return new MyPair(id, bestDistance);
+        return isTooFar;
     }
 
     private Node findFirst(Node node, Point patient) {
