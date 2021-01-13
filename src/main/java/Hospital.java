@@ -71,7 +71,7 @@ public class Hospital extends MapObject {
     }
 
 
-    public void setDistance(int distance) {
+    public void setDistance(double distance) {
         this.distance = distance;
     }
 

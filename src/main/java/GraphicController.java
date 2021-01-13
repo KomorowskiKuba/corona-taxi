@@ -272,8 +272,7 @@ public class GraphicController extends Application {
                 Hospital nearestAndEmptyHospital = dijkstrasAlgorithm.getNearestEmpty(nearestHospital);
 
                 if (nearestAndEmptyHospital != null) {
-                    List<Hospital> path = nearestHospital.getShortestPath();
-                    Collections.reverse(path);
+                    List<Hospital> path = nearestAndEmptyHospital.getShortestPath();
 
                     for (Hospital h : path) {
                         if (h.getId() != nearestHospital.getId()) { //TODO: CHANGE FOR EQUALS
@@ -290,6 +289,8 @@ public class GraphicController extends Application {
                     shouldPlay = false;
                     output.appendText("All hospitals are full! Patient " + p.getId() + " couldn't be transported to hospital! :(\n");
                 }
+
+                dijkstrasAlgorithm.clear();
             } else {
                 nearestHospital.bringPatient();
             }

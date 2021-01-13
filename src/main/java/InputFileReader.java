@@ -76,6 +76,9 @@ public class InputFileReader {
                     line = scanner.nextLine();
                     ++lineNumber;
                     StringTokenizer stringTokenizer = new StringTokenizer(line, delimiter);
+                    if (line.isEmpty()) {
+                        continue;
+                    }
                     if (line.charAt(0) == '#') {
                         break;
                     } else {
@@ -86,10 +89,10 @@ public class InputFileReader {
                                 int y = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
                                 patientList.add(new Patient(id, x, y, false));
                             } catch (NumberFormatException nfe) {
-                                throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym, linia: " + lineNumber + "!");
+                                throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym: " + filePath + " , linia: " + lineNumber + "!");
                             }
                         } else {
-                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "!\nPopraw strukture pliku!");
+                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w pliku wejsciowym: " + filePath + " ,w linii: " + lineNumber + "!\nPopraw strukture pliku!");
                         }
                     }
                 }
@@ -102,7 +105,9 @@ public class InputFileReader {
                     line = scanner.nextLine();
                     ++lineNumber;
                     StringTokenizer stringTokenizer = new StringTokenizer(line, delimiter);
-
+                    if (line.isEmpty()) {
+                        continue;
+                    }
                     if (line.charAt(0) == '#') {
                         break;
                     } else {
@@ -117,11 +122,10 @@ public class InputFileReader {
 
                                 hospitalList.add(new Hospital(id, name, x, y, amountOfTotalBeds, amountOfFreeBeds));
                             } catch (NumberFormatException nfe) {
-                                throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym, linia: " + lineNumber + "!");
+                                throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym: " + filePath + " , linia: " + lineNumber + "!");
                             }
-
                         } else {
-                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "!\nPopraw strukture pliku!");
+                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w pliku wejsciowym: " + filePath + " ,w linii: " + lineNumber + "!\nPopraw strukture pliku!");
                         }
                     }
                 }
@@ -135,6 +139,9 @@ public class InputFileReader {
                     line = scanner.nextLine();
                     ++lineNumber;
                     StringTokenizer stringTokenizer = new StringTokenizer(line, delimiter);
+                    if (line.isEmpty()) {
+                        continue;
+                    }
                     if (line.charAt(0) == '#') {
                         break;
                     } else {
@@ -147,10 +154,10 @@ public class InputFileReader {
 
                                 monumentList.add(new Monument(id, name, x, y));
                             } catch (NumberFormatException nfe) {
-                                throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym, linia: " + lineNumber + "!");
+                                throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym: " + filePath + " , linia: " + lineNumber + "!");
                             }
                         } else {
-                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "!\nPopraw strukture pliku!");
+                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w pliku wejsciowym: " + filePath + " ,w linii: " + lineNumber + "!\nPopraw strukture pliku!");
                         }
                     }
                 }
@@ -163,6 +170,9 @@ public class InputFileReader {
                     line = scanner.nextLine();
                     ++lineNumber;
                     StringTokenizer stringTokenizer = new StringTokenizer(line, delimiter);
+                    if (line.isEmpty()) {
+                        continue;
+                    }
                     if (line.charAt(0) == '#') {
                         break;
                     } else {
@@ -181,10 +191,10 @@ public class InputFileReader {
 
                                 roadList.add(new Road(roadId, firstHospital, secondHospital, distance));
                             } catch (NumberFormatException nfe) {
-                                throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym, linia: " + lineNumber + "!");
+                                throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym: " + filePath + " , linia: " + lineNumber + "!");
                             }
                         } else {
-                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w linii: " + lineNumber + "!\nPopraw strukture pliku!");
+                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w pliku wejsciowym: " + filePath + " ,w linii: " + lineNumber + "!\nPopraw strukture pliku!");
                         }
                     }
                 }
