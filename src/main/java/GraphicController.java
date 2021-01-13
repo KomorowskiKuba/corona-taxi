@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -21,6 +22,13 @@ public class GraphicController extends Application {
     private final int MAX_MS_VALUE = 1000;
     private double centerX;
     private double centerY;
+    private double scale;
+    private int maxPatientId;
+
+    private List<Hospital> hospitals;
+    private final QuadTree qtree = new QuadTree();
+    private ArrayList<Double> countryBorders;
+    private DijkstrasAlgorithm dijkstrasAlgorithm;
 
     @FXML
     private Pane pane;
@@ -69,7 +77,7 @@ public class GraphicController extends Application {
     }
 
     //Rysuje wielokąt na podstawie otrzymanych punktów.
-    private void drawCountry(ArrayList<Double> countryBorders, double scale) {
+    private void drawCountry(ArrayList<Double> countryBorders) {
         for (int i = 0; i < countryBorders.size(); i++) {
             double prevValue = countryBorders.get(i) / scale;
             double value;
@@ -88,7 +96,7 @@ public class GraphicController extends Application {
     }
 
     //Umieszcza na mapie elementy.
-    private void drawMap(List<Road> roads, List<Hospital> hospitals, List<Hospital> hospitalsAndIntersections, List<Monument> monuments, double scale) {
+    private void drawMap(List<Road> roads, List<Hospital> hospitals, List<Hospital> hospitalsAndIntersections, List<Monument> monuments) {
         Circle center = new Circle(centerX, centerY, 2, Color.BLACK);
         pane.getChildren().add(center);
 
@@ -122,13 +130,13 @@ public class GraphicController extends Application {
         }
     }
 
-    private Circle drawPatient(double x, double y, double scale) {
+    private Circle drawPatient(double x, double y) {
         Circle patient = new Circle(x / scale + centerX, centerY - y / scale, 2, Color.PURPLE);
         pane.getChildren().add(patient);
         return patient;
     }
 
-    private double calcScale(Area borders) {
+    private void calcScale(Area borders) {
         double scale = 1;
         boolean incrScale = false;
         while (Math.abs(borders.getxLeft() - borders.getxRight()) / scale > 464 || Math.abs(borders.getyUp() - borders.getyDown()) / scale > 344) {
@@ -138,7 +146,7 @@ public class GraphicController extends Application {
         while ((Math.abs(borders.getxLeft() - borders.getxRight()) / scale < 100 || Math.abs(borders.getyUp() - borders.getyDown()) / scale < 100) && !incrScale) {
             scale /= 2;
         }
-        return scale;
+        this.scale = scale;
     }
 
     private void makeTransition(double scale, int duration, Patient p, Circle pInMap, Hospital nearestHospital, List<TranslateTransition> transitions) {
@@ -153,11 +161,9 @@ public class GraphicController extends Application {
     public void handleButtonClick() {
         String hospPath = hospitalFile.getText();
         String patPath = patientFile.getText();
-        double sliderValue = animSlider.getValue();
         Alert alert = setAlertStyle();
 
         InputFileReader reader;
-        List<Hospital> hospitals;
         List<Monument> monuments;
         List<Road> roads;
         List<Patient> patients;
@@ -196,90 +202,32 @@ public class GraphicController extends Application {
             return;
         }
 
-        //Czyszczenie poprzedniej mapy
         if (pane.getChildren() != null) {
             pane.getChildren().clear();
         }
 
         centerX = pane.getBoundsInLocal().getWidth() / 2;
         centerY = pane.getBoundsInLocal().getHeight() / 2;
+        maxPatientId = patients.get(patients.size()-1).getId();
 
-        ArrayList<Double> countryBorders = ConvexHull.convex_hull(hospitals, monuments);
-
-        QuadTree qtree = new QuadTree();
+        countryBorders = ConvexHull.convex_hull(hospitals, monuments);
         Area quadrant = qtree.calcQuadrant(countryBorders);
-        double scale = calcScale(quadrant);
+        calcScale(quadrant);
+        qtree.fillTree(new ArrayList<>(hospitals), quadrant);
+        dijkstrasAlgorithm = new DijkstrasAlgorithm(hospitalsAndIntersections);
+        drawCountry(countryBorders);
+        drawMap(roads, hospitals, hospitalsAndIntersections, monuments);
 
-        drawCountry(countryBorders, scale);
-        drawMap(roads, hospitals, hospitalsAndIntersections, monuments, scale);
-
-        int duration = (int) (MAX_MS_VALUE * sliderValue);
         Timeline timeLine = new Timeline();
         timeLine.pause();
         Collection<KeyFrame> frames = timeLine.getKeyFrames();
-        Duration frameGap = Duration.millis(duration);
+        int duration = (int) (MAX_MS_VALUE * animSlider.getValue());
         Duration frameTime = Duration.millis(duration);
-
-        qtree.fillTree(new ArrayList<>(hospitals), quadrant);
-        DijkstrasAlgorithm dijkstrasAlgorithm = new DijkstrasAlgorithm(hospitalsAndIntersections);
+        Duration frameGap = frameTime;
 
         for (Patient p : patients) {
-            Point point = new Point(p.getX() + centerX, -p.getY() + centerY);
-
+            makeAnimation(frames, frameTime, p, duration);
             frameTime = frameTime.add(frameGap);
-            frames.add(new KeyFrame(frameTime, e -> {
-                boolean shouldPlay = true;
-                Circle pInMap = drawPatient(p.getX(), p.getY(), scale);
-
-                if (!ConvexHull.isInBorder(countryBorders, point)) {
-                    output.appendText("Patient " + p.getId() + " is outside the country.\n");
-                    FadeTransition fade = new FadeTransition();
-                    fade.setDuration(Duration.millis(duration));
-                    fade.setToValue(0);
-                    fade.setNode(pInMap);
-                    fade.play();
-                    return;
-                }
-
-                int nearestId = qtree.findNearest(p);
-                Hospital nearestHospital = hospitals.get(nearestId);
-
-                List<TranslateTransition> transitions = new ArrayList<>();
-                SequentialTransition transition = new SequentialTransition();
-                makeTransition(scale, duration, p, pInMap, nearestHospital, transitions);
-                output.appendText("Patient " + p.getId() + " >> Hospital " + (nearestId + 1) + "\n");
-
-                if (nearestHospital.getEmptyBeds() == 0) {
-                    Hospital nearestAndEmptyHospital = dijkstrasAlgorithm.getNearestEmpty(nearestHospital);
-
-                    if (nearestAndEmptyHospital != null) {
-                        List<Hospital> path = nearestHospital.getShortestPath();
-                        Collections.reverse(path);
-
-                        for (Hospital h : path) {
-                            if (h.getId() != nearestHospital.getId()) { //TODO: CHANGE FOR EQUALS
-                                makeTransition(scale, duration, p, pInMap, h, transitions);
-                                output.appendText("Patient " + p.getId() + " >> Hospital " + h.getId() + "\n");
-                            }
-                        }
-
-                        makeTransition(scale, duration, p, pInMap, nearestAndEmptyHospital, transitions);
-                        nearestAndEmptyHospital.bringPatient();
-                        output.appendText("Patient " + p.getId() + " >> Hospital " + nearestAndEmptyHospital.getId() + "\n");
-
-                    } else {
-                        shouldPlay = false;
-                        output.appendText("All hospitals are full! Patient " + p.getId() + " couldn't be transported to hospital! :(\n");
-                    }
-                } else {
-                    nearestHospital.bringPatient();
-                }
-
-                if (shouldPlay) {
-                    transition.getChildren().addAll(transitions);
-                    transition.play();
-                }
-            }));
         }
 
         timeLine.setCycleCount(1);
@@ -293,5 +241,78 @@ public class GraphicController extends Application {
                 exception.printStackTrace();
             }
         });
+    }
+
+    private void makeAnimation(Collection<KeyFrame> frames, Duration frameTime, Patient p, int duration) {
+        Point point = new Point(p.getX() + centerX, -p.getY() + centerY);
+
+        frames.add(new KeyFrame(frameTime, e -> {
+            boolean shouldPlay = true;
+            Circle pInMap = drawPatient(p.getX(), p.getY());
+
+            if (!ConvexHull.isInBorder(countryBorders, point)) {
+                output.appendText("Patient " + p.getId() + " is outside the country.\n");
+                FadeTransition fade = new FadeTransition();
+                fade.setDuration(Duration.millis(duration));
+                fade.setToValue(0);
+                fade.setNode(pInMap);
+                fade.play();
+                return;
+            }
+
+            int nearestId = qtree.findNearest(p);
+            Hospital nearestHospital = hospitals.get(nearestId);
+
+            List<TranslateTransition> transitions = new ArrayList<>();
+            SequentialTransition transition = new SequentialTransition();
+            makeTransition(scale, duration, p, pInMap, nearestHospital, transitions);
+            output.appendText("Patient " + p.getId() + " >> Hospital " + (nearestId + 1) + "\n");
+
+            if (nearestHospital.getEmptyBeds() == 0) {
+                Hospital nearestAndEmptyHospital = dijkstrasAlgorithm.getNearestEmpty(nearestHospital);
+
+                if (nearestAndEmptyHospital != null) {
+                    List<Hospital> path = nearestHospital.getShortestPath();
+                    Collections.reverse(path);
+
+                    for (Hospital h : path) {
+                        if (h.getId() != nearestHospital.getId()) { //TODO: CHANGE FOR EQUALS
+                            makeTransition(scale, duration, p, pInMap, h, transitions);
+                            output.appendText("Patient " + p.getId() + " >> Hospital " + h.getId() + "\n");
+                        }
+                    }
+
+                    makeTransition(scale, duration, p, pInMap, nearestAndEmptyHospital, transitions);
+                    nearestAndEmptyHospital.bringPatient();
+                    output.appendText("Patient " + p.getId() + " >> Hospital " + nearestAndEmptyHospital.getId() + "\n");
+
+                } else {
+                    shouldPlay = false;
+                    output.appendText("All hospitals are full! Patient " + p.getId() + " couldn't be transported to hospital! :(\n");
+                }
+            } else {
+                nearestHospital.bringPatient();
+            }
+
+            if (shouldPlay) {
+                transition.getChildren().addAll(transitions);
+                transition.play();
+            }
+        }));
+    }
+
+    public void handleMouseClick(MouseEvent mouseEvent) {
+        double x = mouseEvent.getX() - centerX;
+        double y = -mouseEvent.getY() + centerY;
+
+        Timeline timeLine = new Timeline();
+        Collection<KeyFrame> frames = timeLine.getKeyFrames();
+        int duration = (int) (MAX_MS_VALUE * animSlider.getValue());
+        Duration frameTime = Duration.millis(duration);
+        Patient p = new Patient(++maxPatientId, (int) x, (int) y, false);
+
+        makeAnimation(frames, frameTime, p, duration);
+        timeLine.setCycleCount(1);
+        timeLine.play();
     }
 }
