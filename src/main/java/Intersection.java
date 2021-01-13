@@ -159,10 +159,14 @@ public class Intersection {
         distanceBtwnHospitals = Math.sqrt(Math.pow((double)q1.x - (double) p1.x, 2) + Math.pow((double)q1.y - (double)p1.y, 2));
         realDistance = (distanceBtwnHsptlAndIntr/distanceBtwnHospitals) * getRoadByHospitals(roadList, firstHospital, secondHospital).getDistance();
         roadList.add(new Road(roadIndex, firstHospital, intersection, realDistance));
+        intersection.addDestination(firstHospital,realDistance);
+        firstHospital.addDestination(intersection, realDistance);
 
         distanceBtwnHsptlAndIntr = Math.sqrt(Math.pow(x - (double) q1.x, 2) + Math.pow(y - (double)q1.y, 2));
         realDistance = (distanceBtwnHsptlAndIntr/distanceBtwnHospitals) * getRoadByHospitals(roadList, firstHospital, secondHospital).getDistance();
         roadList.add(new Road(roadIndex + 1, secondHospital, intersection, realDistance));
+        intersection.addDestination(secondHospital,realDistance);
+        secondHospital.addDestination(intersection, realDistance);
 
         roadList.remove(getRoadByHospitals(roadList, firstHospital, secondHospital));
 
@@ -172,10 +176,14 @@ public class Intersection {
         distanceBtwnHospitals = Math.sqrt(Math.pow((double)q2.x - (double) p2.x, 2) + Math.pow((double)q2.y - (double)p2.y, 2));
         realDistance = (distanceBtwnHsptlAndIntr/distanceBtwnHospitals) * getRoadByHospitals(roadList, firstHospital, secondHospital).getDistance();
         roadList.add(new Road(roadIndex + 2, firstHospital, intersection, realDistance));
+        intersection.addDestination(firstHospital,realDistance);
+        firstHospital.addDestination(intersection, realDistance);
 
         distanceBtwnHsptlAndIntr = Math.sqrt(Math.pow(x - (double) q2.x, 2) + Math.pow(y - (double)q2.y, 2));
         realDistance = (distanceBtwnHsptlAndIntr/distanceBtwnHospitals) * getRoadByHospitals(roadList, firstHospital, secondHospital).getDistance();
         roadList.add(new Road(roadIndex + 3, secondHospital, intersection, realDistance));
+        intersection.addDestination(secondHospital,realDistance);
+        secondHospital.addDestination(intersection, realDistance);
 
         roadList.remove(getRoadByHospitals(roadList, firstHospital, secondHospital));
 

@@ -7,9 +7,9 @@ public class Hospital extends MapObject {
     private final int totalBeds;
     private int emptyBeds;
     private final String name;
-    private int distance = Integer.MAX_VALUE;
+    private double distance = Double.MAX_VALUE;
     private List<Hospital> shortestPath = new LinkedList<>();
-    private final Map<Hospital, Integer> adjacentHospitalsMap = new HashMap<>();
+    private final Map<Hospital, Double> adjacentHospitalsMap = new HashMap<>();
 
     public Hospital(int id, String name, double x, double y, int totBeds, int freeBeds) {
         super(id, x, y);
@@ -54,15 +54,15 @@ public class Hospital extends MapObject {
         return emptyBeds;
     }
 
-    public int getDistance() {
+    public double getDistance() {
         return distance;
     }
 
-    public void addDestination(Hospital destination, int distance) {
+    public void addDestination(Hospital destination, double distance) {
         adjacentHospitalsMap.put(destination, distance);
     }
 
-    public Map<Hospital, Integer> getAdjacentNodeMap() {
+    public Map<Hospital, Double> getAdjacentNodeMap() {
         return adjacentHospitalsMap;
     }
 
