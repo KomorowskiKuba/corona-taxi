@@ -1,7 +1,4 @@
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Hospital extends MapObject {
     private final int totalBeds;
@@ -87,5 +84,18 @@ public class Hospital extends MapObject {
                 ", name='" + name + '\'' +
                 ", distance=" + distance +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Hospital)) return false;
+        Hospital hospital = (Hospital) o;
+        return totalBeds == hospital.totalBeds && emptyBeds == hospital.emptyBeds && name.equals(hospital.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(totalBeds, emptyBeds, name);
     }
 }

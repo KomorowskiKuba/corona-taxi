@@ -13,7 +13,7 @@ class Graph {
 }
 
 public class DijkstrasAlgorithm {
-    private Graph graph;
+    private final Graph graph;
 
     DijkstrasAlgorithm(List<Hospital> hospitals) {
         graph = createGraph(hospitals);
@@ -29,11 +29,7 @@ public class DijkstrasAlgorithm {
         return graph;
     }
 
-    public Graph getGraph() {
-        return graph;
-    }
-
-    public static void calculateShortestPathsFromNode(Hospital node) {
+    private static void calculateShortestPathsFromNode(Hospital node) {
         Set<Hospital> settledNodes = new HashSet<>();
         Set<Hospital> unsettledNodes = new HashSet<>();
 
@@ -104,6 +100,10 @@ public class DijkstrasAlgorithm {
             h.setDistance(Integer.MAX_VALUE);
             h.setShortestPath(new LinkedList<>());
         }
+    }
+
+    public Graph getGraph() {
+        return graph;
     }
 
     public static void main(String[] args) {

@@ -19,8 +19,10 @@ public class InputFileReader {
     private static List<Patient> patientList;
     private static List<Hospital> hospitalAndIntersectionList;
 
-    public InputFileReader(){
+    public InputFileReader() {
+
     }
+
     public InputFileReader(String filePath, boolean readPatients) throws IllegalFormatException, FileNotFoundException, NullPointerException {
         hospitalList = new ArrayList<>();
         monumentList = new ArrayList<>();
@@ -31,7 +33,7 @@ public class InputFileReader {
             throw new IllegalArgumentException("Nie podano nazwy pliku wejsciowego!");
         }
 
-        if (filePath.equals(".")) {
+        if (filePath.equals(".")) { //TODO: WYJASNIC XD
             throw new IllegalArgumentException("Błędna nazwa pliku wejściowego!");
         }
 
@@ -41,11 +43,12 @@ public class InputFileReader {
             throw new IllegalArgumentException("Bledny format pliku wejsciowego!\nPlik wejsciowy powinien byc zapisany w formacie \".txt\"");
         }
 
-        if ((hospitalList.size() == 0 || monumentList.size() == 0 || roadList.size() == 0) && !readPatients) {
+        if ((hospitalList.size() == 0 || monumentList.size() == 0 || roadList.size() == 0) && !readPatients) { //TODO: WYJASNIC
             throw new NullPointerException("W pliku " + filePath + " brakuje danych!");
         } else if (patientList.size() == 0 && readPatients) {
             throw new NullPointerException("W pliku " + filePath + " brakuje danych!");
         }
+
         initializeHospitalAndIntersectionList();
         Intersection intersection = new Intersection();
         intersection.findIntersections(hospitalList, hospitalAndIntersectionList, roadList);
@@ -129,7 +132,9 @@ public class InputFileReader {
                         }
                     }
                 }
-
+                if (hospitalList.size() == 0) {
+                    throw new IllegalArgumentException("W pliku wejsciowym nie podano zadnych szpitali!");
+                }
             } else {
                 throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!");
             }
@@ -229,6 +234,23 @@ public class InputFileReader {
         return trimmedWord;
     }
 
+    private boolean checkFileFormat(String fileName) {
+        StringTokenizer stringTokenizer = new StringTokenizer(fileName, ".");
+        List<String> tokens = new ArrayList<>();
+
+        while (stringTokenizer.hasMoreTokens()) {
+            tokens.add(stringTokenizer.nextToken());
+        }
+
+        return tokens.get(tokens.size() - 1).equals(acceptedFormat);
+    }
+
+    private void initializeHospitalAndIntersectionList() {
+        for (int i = 0; i < hospitalList.size(); i++) {
+            hospitalAndIntersectionList.add(hospitalList.get(i));
+        }
+    }
+
     public List<Hospital> getHospitalList() {
         return hospitalList;
     }
@@ -247,53 +269,5 @@ public class InputFileReader {
 
     public List<Hospital> getHospitalAndIntersectionList() {
         return hospitalAndIntersectionList;
-    }
-
-    private boolean checkFileFormat(String fileName) {
-        StringTokenizer stringTokenizer = new StringTokenizer(fileName, ".");
-        List<String> tokens = new ArrayList<>();
-
-        while (stringTokenizer.hasMoreTokens()) {
-            tokens.add(stringTokenizer.nextToken());
-        }
-
-        return tokens.get(tokens.size() - 1).equals(acceptedFormat);
-    }
-
-    public static void main(String[] args) {
-        String location2 = "src/data/sampleData.txt";
-        InputFileReader ifr = null;
-
-        try {
-            ifr = new InputFileReader(location2, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.out.println("HOSPITALS: ");
-        for (Hospital h : Objects.requireNonNull(ifr).getHospitalList()) {
-            System.out.println(h.toString());
-        }
-        System.out.println("===========================================");
-        System.out.println("MONUMENTS: ");
-        for (Monument m : Objects.requireNonNull(ifr).getMonumentList()) {
-            System.out.println(m.toString());
-        }
-        System.out.println("===========================================");
-        System.out.println("ROADS: ");
-        for (Road r : Objects.requireNonNull(ifr).getRoadList()) {
-            System.out.println(r.toString());
-        }
-        System.out.println("===========================================");
-        System.out.println("PATIENTS: ");
-        for (Patient p : Objects.requireNonNull(ifr).getPatientList()) {
-            System.out.println(p.toString());
-        }
-        System.out.println("===========================================");
-    }
-
-    private void initializeHospitalAndIntersectionList() {
-        for (int i = 0; i < hospitalList.size(); i++) {
-            hospitalAndIntersectionList.add(hospitalList.get(i));
-        }
     }
 }
