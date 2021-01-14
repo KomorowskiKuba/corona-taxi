@@ -1,12 +1,6 @@
 public class Patient extends MapObject {
-    private boolean isAdditional;
-    Patient(int id, int x, int y, boolean isAdditional) {
+    Patient(int id, int x, int y) {
         super(id, x, y);
-        this.isAdditional = isAdditional;
-    }
-
-    public boolean isAdditional() {
-        return isAdditional;
     }
 
     @Override

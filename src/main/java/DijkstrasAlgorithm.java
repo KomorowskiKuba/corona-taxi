@@ -139,12 +139,5 @@ public class DijkstrasAlgorithm {
         Hospital n = dijkstrasAlgorithm.getNearestEmpty(node1);
         System.out.println(n.toString());
         System.out.println(n.getShortestPath().toString());
-
-        //DijkstrasAlgorithm.calculateShortestPathFromNode(graph, nodeA);
-
-        //for (GraphNode n : graph.getNodes()) {
-        //    System.out.println("ID: " + n.getId() + " " + n.getDistance() + " " + n.isEmpty());
-        //System.out.println(n.toString());
-        //}
     }
 }

@@ -139,6 +139,15 @@ class Area {
         }
     }
 
+    public boolean equals(Area area) {
+        boolean isLeftEqual = this.xLeft == area.xLeft;
+        boolean isRightEqual = this.xRight  == area.xRight;
+        boolean isUpEqual = this.yUp == area.yUp;
+        boolean isDownEqual = this.yDown == area.yDown;
+
+        return isLeftEqual && isRightEqual && isUpEqual && isDownEqual;
+    }
+
     public double getyUp() {
         return yUp;
     }
@@ -228,7 +237,7 @@ public class QuadTree {
         }
     }
 
-    public Area calcQuadrant(ArrayList<Double> vector) {
+    public static Area calcQuadrant(ArrayList<Double> vector) {
         double xRight = vector.get(0);
         double xLeft = vector.get(0);
         double yLeft = vector.get(1);
@@ -293,7 +302,7 @@ public class QuadTree {
         searchNode(firstNode, p);
         searchNode(root, p);
 
-        return best.getId() - 1;
+        return best.getId();
     }
 
     private enum position {UP, DOWN, RIGHT, LEFT}

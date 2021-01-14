@@ -16,7 +16,10 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 public class GraphicController extends Application {
     private final int MAX_MS_VALUE = 1000;
@@ -76,7 +79,6 @@ public class GraphicController extends Application {
         return alert;
     }
 
-    //Rysuje wielokąt na podstawie otrzymanych punktów.
     private void drawCountry(ArrayList<Double> countryBorders) {
         for (int i = 0; i < countryBorders.size(); i++) {
             double prevValue = countryBorders.get(i) / scale;
@@ -95,7 +97,6 @@ public class GraphicController extends Application {
         pane.getChildren().add(country);
     }
 
-    //Umieszcza na mapie elementy.
     private void drawMap(List<Road> roads, List<Hospital> hospitals, List<Hospital> hospitalsAndIntersections, List<Monument> monuments) {
         Circle center = new Circle(centerX, centerY, 2, Color.BLACK);
         pane.getChildren().add(center);
@@ -208,10 +209,10 @@ public class GraphicController extends Application {
 
         centerX = pane.getBoundsInLocal().getWidth() / 2;
         centerY = pane.getBoundsInLocal().getHeight() / 2;
-        maxPatientId = patients.get(patients.size()-1).getId();
+        maxPatientId = patients.get(patients.size() - 1).getId();
 
         countryBorders = ConvexHull.convex_hull(hospitals, monuments);
-        Area quadrant = qtree.calcQuadrant(countryBorders);
+        Area quadrant = QuadTree.calcQuadrant(countryBorders);
         calcScale(quadrant);
         qtree.fillTree(new ArrayList<>(hospitals), quadrant);
         dijkstrasAlgorithm = new DijkstrasAlgorithm(hospitalsAndIntersections);
@@ -260,7 +261,7 @@ public class GraphicController extends Application {
                 return;
             }
 
-            int nearestId = qtree.findNearest(p);
+            int nearestId = qtree.findNearest(p) - 1;
             Hospital nearestHospital = hospitals.get(nearestId);
 
             List<TranslateTransition> transitions = new ArrayList<>();
@@ -275,7 +276,7 @@ public class GraphicController extends Application {
                     List<Hospital> path = nearestAndEmptyHospital.getShortestPath();
 
                     for (Hospital h : path) {
-                        if (h.getId() != nearestHospital.getId()) { //TODO: CHANGE FOR EQUALS
+                        if (h.getId() != nearestHospital.getId()) {
                             makeTransition(scale, duration, p, pInMap, h, transitions);
                             output.appendText("Patient " + p.getId() + " >> Hospital " + h.getId() + "\n");
                         }
@@ -310,7 +311,7 @@ public class GraphicController extends Application {
         Collection<KeyFrame> frames = timeLine.getKeyFrames();
         int duration = (int) (MAX_MS_VALUE * animSlider.getValue());
         Duration frameTime = Duration.millis(duration);
-        Patient p = new Patient(++maxPatientId, (int) x, (int) y, false);
+        Patient p = new Patient(++maxPatientId, (int) x, (int) y);
 
         makeAnimation(frames, frameTime, p, duration);
         timeLine.setCycleCount(1);

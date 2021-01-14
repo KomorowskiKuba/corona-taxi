@@ -1,5 +1,4 @@
 import java.util.List;
-import java.util.Objects;
 
 public class Road {
     private final int id;
@@ -36,18 +35,5 @@ public class Road {
 
     public double getDistance() {
         return distance;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Road)) return false;
-        Road road = (Road) o;
-        return id == road.id && Double.compare(road.distance, distance) == 0 && firstHospital.equals(road.firstHospital) && secondHospital.equals(road.secondHospital);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, firstHospital, secondHospital, distance);
     }
 }

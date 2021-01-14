@@ -23,23 +23,14 @@ public class Intersection {
             Point other = (Point) obj;
             if (this.x != other.x) {
                 return false;
-            } else if (this.y != other.y) {
-                return false;
-            }
-            return true;
+            } else return this.y == other.y;
         }
     }
-
-    ;
 
 
     static boolean onSegment(Point p, Point q, Point r) {
 
-        if (q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y)) {
-            return true;
-        }
-
-        return false;
+        return q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) && q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y);
     }
 
 
@@ -82,11 +73,7 @@ public class Intersection {
             return true;
         }
 
-        if (o4 == 0 && onSegment(p2, q1, q2)) {
-            return true;
-        }
-
-        return false;
+        return o4 == 0 && onSegment(p2, q1, q2);
     }
 
     static double[] findCrossPoint(Point a, Point b, Point c, Point d) {
@@ -118,15 +105,14 @@ public class Intersection {
 
 
     public void findIntersections(List<Hospital> hospitalList, List<Hospital> hospitalAndIntersectionList, List<Road> roadList) {
-        ArrayList<Double> intersectionsList = new ArrayList<>();
         ArrayList<Point> pointList = new ArrayList<>();
         int roadIndex = roadList.size() + 1;
         int hospitalIndex = hospitalList.size() + 1;
         int intersectionIndex = 1;
         int n;
-        for (int i = 0; i < roadList.size(); i++) {
-            Point p = new Point((int) roadList.get(i).getFirstHospital().getX(), (int) roadList.get(i).getFirstHospital().getY());
-            Point q = new Point((int) roadList.get(i).getSecondHospital().getX(), (int) roadList.get(i).getSecondHospital().getY());
+        for (Road road : roadList) {
+            Point p = new Point((int) road.getFirstHospital().getX(), (int) road.getFirstHospital().getY());
+            Point q = new Point((int) road.getSecondHospital().getX(), (int) road.getSecondHospital().getY());
             pointList.add(p);
             pointList.add(q);
         }
@@ -148,13 +134,12 @@ public class Intersection {
     }
 
     private int addRoads(Point p1, Point q1, Point p2, Point q2, double x, double y, int roadIndex, Hospital intersection, List<Hospital> hospitalList, List<Road> roadList) {
-        InputFileReader ifr = new InputFileReader();
         double distanceBtwnHsptlAndIntr;
         double distanceBtwnHospitals;
         double realDistance;
 
-        Hospital firstHospital = Hospital.findHospitalByCoordinates(hospitalList, (double)p1.x, (double)p1.y);
-        Hospital secondHospital = Hospital.findHospitalByCoordinates(hospitalList, (double)q1.x, (double)q1.y);
+        Hospital firstHospital = Hospital.findHospitalByCoordinates(hospitalList, p1.x, p1.y);
+        Hospital secondHospital = Hospital.findHospitalByCoordinates(hospitalList, q1.x, q1.y);
         distanceBtwnHsptlAndIntr = Math.sqrt(Math.pow(x - (double) p1.x, 2) + Math.pow(y - (double)p1.y, 2));
         distanceBtwnHospitals = Math.sqrt(Math.pow((double)q1.x - (double) p1.x, 2) + Math.pow((double)q1.y - (double)p1.y, 2));
         realDistance = (distanceBtwnHsptlAndIntr/distanceBtwnHospitals) * getRoadByHospitals(roadList, firstHospital, secondHospital).getDistance();
@@ -170,8 +155,8 @@ public class Intersection {
 
         roadList.remove(getRoadByHospitals(roadList, firstHospital, secondHospital));
 
-        firstHospital = Hospital.findHospitalByCoordinates(hospitalList, (double)p2.x, (double)p2.y);
-        secondHospital = Hospital.findHospitalByCoordinates(hospitalList, (double)q2.x, (double)q2.y);
+        firstHospital = Hospital.findHospitalByCoordinates(hospitalList, p2.x, p2.y);
+        secondHospital = Hospital.findHospitalByCoordinates(hospitalList, q2.x, q2.y);
         distanceBtwnHsptlAndIntr = Math.sqrt(Math.pow(x - (double) p2.x, 2) + Math.pow(y - (double)p2.y, 2));
         distanceBtwnHospitals = Math.sqrt(Math.pow((double)q2.x - (double) p2.x, 2) + Math.pow((double)q2.y - (double)p2.y, 2));
         realDistance = (distanceBtwnHsptlAndIntr/distanceBtwnHospitals) * getRoadByHospitals(roadList, firstHospital, secondHospital).getDistance();
@@ -190,16 +175,16 @@ public class Intersection {
         return ++roadIndex;
     }
     public Road getRoadByHospitals(List<Road> roadList, Hospital firstHospital, Hospital secondHospital){
-        for( int i = 0; i< roadList.size(); i++){
-            if(roadList.get(i).getFirstHospital() == firstHospital || roadList.get(i).getFirstHospital() == secondHospital){
-                if(roadList.get(i).getFirstHospital() == firstHospital){
-                    if(roadList.get(i).getSecondHospital() == secondHospital){
-                        return roadList.get(i);
+        for (Road road : roadList) {
+            if (road.getFirstHospital() == firstHospital || road.getFirstHospital() == secondHospital) {
+                if (road.getFirstHospital() == firstHospital) {
+                    if (road.getSecondHospital() == secondHospital) {
+                        return road;
                     }
                 }
-                if(roadList.get(i).getFirstHospital() == secondHospital){
-                    if(roadList.get(i).getSecondHospital() == firstHospital){
-                        return roadList.get(i);
+                if (road.getFirstHospital() == secondHospital) {
+                    if (road.getSecondHospital() == firstHospital) {
+                        return road;
                     }
                 }
             }
