@@ -1,5 +1,3 @@
-import javafx.util.Pair;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -19,8 +17,8 @@ public class InputFileReader {
     private static List<Patient> patientList;
     private static List<Hospital> hospitalAndIntersectionList;
 
-    public InputFileReader(){
-    }
+    public InputFileReader(){}
+
     public InputFileReader(String filePath, boolean readPatients) throws IllegalFormatException, FileNotFoundException, NullPointerException {
         hospitalList = new ArrayList<>();
         monumentList = new ArrayList<>();
@@ -71,7 +69,7 @@ public class InputFileReader {
         }
 
         if (readPatients) {
-            if (checkIfLineIsAComment(line, patientsComment)) {
+            if (checkIfLineIsAComment(line)) {
                 while (scanner.hasNextLine()) {
                     line = scanner.nextLine();
                     ++lineNumber;
@@ -87,7 +85,7 @@ public class InputFileReader {
                                 int id = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
                                 int x = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
                                 int y = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
-                                patientList.add(new Patient(id, x, y, false));
+                                patientList.add(new Patient(id, x, y));
                             } catch (NumberFormatException nfe) {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym: " + filePath + " , linia: " + lineNumber + "!");
                             }
@@ -100,7 +98,7 @@ public class InputFileReader {
                 throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!");
             }
         } else {
-            if (checkIfLineIsAComment(line, hospitalsComment)) {
+            if (checkIfLineIsAComment(line)) {
                 while (scanner.hasNextLine()) {
                     line = scanner.nextLine();
                     ++lineNumber;
@@ -134,7 +132,7 @@ public class InputFileReader {
                 throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!");
             }
 
-            if (checkIfLineIsAComment(line, monumentsComment)) {
+            if (checkIfLineIsAComment(line)) {
                 while (scanner.hasNextLine()) {
                     line = scanner.nextLine();
                     ++lineNumber;
@@ -165,7 +163,7 @@ public class InputFileReader {
                 throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!");
             }
 
-            if (checkIfLineIsAComment(line, roadsComment)) {
+            if (checkIfLineIsAComment(line)) {
                 while (scanner.hasNextLine()) {
                     line = scanner.nextLine();
                     ++lineNumber;
@@ -204,7 +202,7 @@ public class InputFileReader {
         }
     }
 
-    private static boolean checkIfLineIsAComment(String line, String comment) {
+    private static boolean checkIfLineIsAComment(String line) {
         if (line.charAt(0) == '#') {
             if (line.equals(line)) { //TODO: CHANGE THIS
                 return true;

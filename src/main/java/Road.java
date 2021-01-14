@@ -1,9 +1,7 @@
-import java.util.List;
-
 public class Road {
     private final int id;
-    private Hospital firstHospital;
-    private Hospital secondHospital;
+    private final Hospital firstHospital;
+    private final Hospital secondHospital;
     private final double distance;
 
     public Road(int id, Hospital firstHospital, Hospital secondHospital, double distance) {
@@ -27,10 +25,6 @@ public class Road {
 
     public Hospital getSecondHospital() {
         return secondHospital;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public double getDistance() {

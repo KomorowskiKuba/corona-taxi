@@ -30,7 +30,7 @@ public class Hospital extends MapObject {
     public static Hospital findHospitalByCoordinates(List<Hospital> hospitalList, double x, double y) {
         for (Hospital h : hospitalList) {
             if (h.getX() == x) {
-                if (h.getY() == y){
+                if (h.getY() == y) {
                     return h;
                 }
             }
@@ -38,16 +38,8 @@ public class Hospital extends MapObject {
         return null;
     }
 
-    public int bringPatient() {
+    public void bringPatient() {
         emptyBeds--;
-        if (emptyBeds == 0) {
-            return 0;
-        }
-        return emptyBeds;
-    }
-
-    public int getTotalBeds() {
-        return totalBeds;
     }
 
     public int getEmptyBeds() {
@@ -69,7 +61,6 @@ public class Hospital extends MapObject {
     public List<Hospital> getShortestPath() {
         return shortestPath;
     }
-
 
     public void setDistance(double distance) {
         this.distance = distance;
