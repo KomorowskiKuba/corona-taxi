@@ -1,5 +1,5 @@
+import org.testng.Assert;
 import org.testng.annotations.Test;
-import org.testng.*;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class InputFileReaderTest {
         boolean readPatients = true;
 
         InputFileReader inputFileReader = new InputFileReader(filePath, readPatients);
-    } //TODO: KODOWANIE GLUPIE
+    }
 
     @Test
     public void readFromFile_givenNormalFile_properListsGot() throws FileNotFoundException {

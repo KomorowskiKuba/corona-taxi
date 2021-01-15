@@ -105,39 +105,4 @@ public class DijkstrasAlgorithm {
     public Graph getGraph() {
         return graph;
     }
-
-    public static void main(String[] args) {
-        List<Hospital> hospitals = new ArrayList<>();
-
-        Hospital node1 = new Hospital(1, "Hospital1", 1,1, 100, 0);
-        Hospital node2 = new Hospital(2, "Hospital2", 2,2, 100, 0);
-        Hospital node3 = new Hospital(3, "Hospital3", 3,3, 100, 0);
-        Hospital node4 = new Hospital(4, "Hospital4", 4,4, 100, 0);
-        Hospital node5 = new Hospital(5, "Hospital5", 5,5, 100, 100);
-        Hospital node6 = new Hospital(6, "Hospital6", 6,6, 100, 100);
-
-
-        node1.addDestination(node2, 10);
-        node1.addDestination(node3, 15);
-        node2.addDestination(node4, 12);
-        node2.addDestination(node6, 15);
-        node3.addDestination(node5, 10);
-        node4.addDestination(node5, 2);
-        node4.addDestination(node6, 1);
-        node6.addDestination(node5, 5);
-
-        hospitals.add(node1);
-        hospitals.add(node2);
-        hospitals.add(node3);
-        hospitals.add(node4);
-        hospitals.add(node5);
-        hospitals.add(node6);
-
-        DijkstrasAlgorithm dijkstrasAlgorithm = new DijkstrasAlgorithm(hospitals);
-
-        System.out.println();
-        Hospital n = dijkstrasAlgorithm.getNearestEmpty(node1);
-        System.out.println(n.toString());
-        System.out.println(n.getShortestPath().toString());
-    }
 }

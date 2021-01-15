@@ -21,6 +21,7 @@ public class InputFileReader {
 
     public InputFileReader(){
     }
+
     public InputFileReader(String filePath, boolean readPatients) throws IllegalFormatException, FileNotFoundException, NullPointerException {
         hospitalList = new ArrayList<>();
         monumentList = new ArrayList<>();
@@ -87,7 +88,8 @@ public class InputFileReader {
                                 int id = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
                                 int x = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
                                 int y = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
-                                patientList.add(new Patient(id, x, y, false));
+
+                                patientList.add(new Patient(id, x, y));
                             } catch (NumberFormatException nfe) {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym: " + filePath + " , linia: " + lineNumber + "!");
                             }
@@ -128,6 +130,9 @@ public class InputFileReader {
                             throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w pliku wejsciowym: " + filePath + " ,w linii: " + lineNumber + "!\nPopraw strukture pliku!");
                         }
                     }
+                }
+                if (hospitalList.isEmpty()) {
+                    throw new IllegalArgumentException("W pliku wejsciowym nie podano zadnych szpitali!");
                 }
 
             } else {
