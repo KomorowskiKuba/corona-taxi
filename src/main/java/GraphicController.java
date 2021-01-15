@@ -205,6 +205,7 @@ public class GraphicController extends Application {
 
         if (pane.getChildren() != null) {
             pane.getChildren().clear();
+            output.clear();
         }
 
         centerX = pane.getBoundsInLocal().getWidth() / 2;

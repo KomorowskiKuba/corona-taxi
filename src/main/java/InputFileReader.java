@@ -1,5 +1,3 @@
-import javafx.util.Pair;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -19,15 +17,13 @@ public class InputFileReader {
     private static List<Patient> patientList;
     private static List<Hospital> hospitalAndIntersectionList;
 
-    public InputFileReader(){
-    }
-
     public InputFileReader(String filePath, boolean readPatients) throws IllegalFormatException, FileNotFoundException, NullPointerException {
         hospitalList = new ArrayList<>();
         monumentList = new ArrayList<>();
         roadList = new ArrayList<>();
         patientList = new ArrayList<>();
         hospitalAndIntersectionList = new ArrayList<>();
+
         if (filePath.isEmpty()) {
             throw new IllegalArgumentException("Nie podano nazwy pliku wejsciowego!");
         }
@@ -47,16 +43,20 @@ public class InputFileReader {
         } else if (patientList.size() == 0 && readPatients) {
             throw new NullPointerException("W pliku " + filePath + " brakuje danych!");
         }
+
         initializeHospitalAndIntersectionList();
+
         Intersection intersection = new Intersection();
+
         intersection.findIntersections(hospitalList, hospitalAndIntersectionList, roadList);
     }
 
     private static void readFromFile(String filePath, boolean readPatients) throws FileNotFoundException {
+        int lineNumber = 0;
+
         File inputFile = new File(filePath);
         Scanner scanner;
         String line;
-        int lineNumber = 0;
 
         try {
             scanner = new Scanner(inputFile);
@@ -106,7 +106,9 @@ public class InputFileReader {
                 while (scanner.hasNextLine()) {
                     line = scanner.nextLine();
                     ++lineNumber;
+
                     StringTokenizer stringTokenizer = new StringTokenizer(line, delimiter);
+
                     if (line.isEmpty()) {
                         continue;
                     }
@@ -134,7 +136,6 @@ public class InputFileReader {
                 if (hospitalList.isEmpty()) {
                     throw new IllegalArgumentException("W pliku wejsciowym nie podano zadnych szpitali!");
                 }
-
             } else {
                 throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!");
             }
@@ -143,7 +144,9 @@ public class InputFileReader {
                 while (scanner.hasNextLine()) {
                     line = scanner.nextLine();
                     ++lineNumber;
+
                     StringTokenizer stringTokenizer = new StringTokenizer(line, delimiter);
+
                     if (line.isEmpty()) {
                         continue;
                     }
@@ -174,7 +177,9 @@ public class InputFileReader {
                 while (scanner.hasNextLine()) {
                     line = scanner.nextLine();
                     ++lineNumber;
+
                     StringTokenizer stringTokenizer = new StringTokenizer(line, delimiter);
+
                     if (line.isEmpty()) {
                         continue;
                     }
@@ -234,6 +239,21 @@ public class InputFileReader {
         return trimmedWord;
     }
 
+    private boolean checkFileFormat(String fileName) {
+        StringTokenizer stringTokenizer = new StringTokenizer(fileName, ".");
+        List<String> tokens = new ArrayList<>();
+
+        while (stringTokenizer.hasMoreTokens()) {
+            tokens.add(stringTokenizer.nextToken());
+        }
+
+        return tokens.get(tokens.size() - 1).equals(acceptedFormat);
+    }
+
+    private void initializeHospitalAndIntersectionList() {
+        hospitalAndIntersectionList.addAll(hospitalList);
+    }
+
     public List<Hospital> getHospitalList() {
         return hospitalList;
     }
@@ -252,53 +272,5 @@ public class InputFileReader {
 
     public List<Hospital> getHospitalAndIntersectionList() {
         return hospitalAndIntersectionList;
-    }
-
-    private boolean checkFileFormat(String fileName) {
-        StringTokenizer stringTokenizer = new StringTokenizer(fileName, ".");
-        List<String> tokens = new ArrayList<>();
-
-        while (stringTokenizer.hasMoreTokens()) {
-            tokens.add(stringTokenizer.nextToken());
-        }
-
-        return tokens.get(tokens.size() - 1).equals(acceptedFormat);
-    }
-
-    public static void main(String[] args) {
-        String location2 = "src/data/sampleData.txt";
-        InputFileReader ifr = null;
-
-        try {
-            ifr = new InputFileReader(location2, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.out.println("HOSPITALS: ");
-        for (Hospital h : Objects.requireNonNull(ifr).getHospitalList()) {
-            System.out.println(h.toString());
-        }
-        System.out.println("===========================================");
-        System.out.println("MONUMENTS: ");
-        for (Monument m : Objects.requireNonNull(ifr).getMonumentList()) {
-            System.out.println(m.toString());
-        }
-        System.out.println("===========================================");
-        System.out.println("ROADS: ");
-        for (Road r : Objects.requireNonNull(ifr).getRoadList()) {
-            System.out.println(r.toString());
-        }
-        System.out.println("===========================================");
-        System.out.println("PATIENTS: ");
-        for (Patient p : Objects.requireNonNull(ifr).getPatientList()) {
-            System.out.println(p.toString());
-        }
-        System.out.println("===========================================");
-    }
-
-    private void initializeHospitalAndIntersectionList() {
-        for (int i = 0; i < hospitalList.size(); i++) {
-            hospitalAndIntersectionList.add(hospitalList.get(i));
-        }
     }
 }
