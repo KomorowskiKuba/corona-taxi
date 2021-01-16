@@ -44,7 +44,7 @@ public class ConvexHullTest {
             monumentList.add(new Monument(i + 1, "Monument", inputPoints1[i], inputPoints1[i+1]));
         }
 
-        expectedResult= new ArrayList<Double>(Arrays.asList(expectedOutputPoints1));
+        expectedResult= new ArrayList<>(Arrays.asList(expectedOutputPoints1));
         result = ConvexHull.convex_hull(hospitalList, monumentList);
 
         Assert.assertEquals(result, expectedResult);
@@ -66,7 +66,7 @@ public class ConvexHullTest {
             monumentList.add(new Monument(i + 1, "Monument", inputPoints2[i], inputPoints2[i+1]));
         }
 
-        expectedResult= new ArrayList<Double>(Arrays.asList(expectedOutputPoints2));
+        expectedResult= new ArrayList<>(Arrays.asList(expectedOutputPoints2));
         result = ConvexHull.convex_hull(hospitalList, monumentList);
 
         Assert.assertEquals(result, expectedResult);
@@ -80,7 +80,7 @@ public class ConvexHullTest {
         }
 
         for (int i = 0; i < 10; i++){
-            Assert.assertEquals(ConvexHull.isInBorder(borders, patientList.get(i)), true);
+            Assert.assertTrue(ConvexHull.isInBorder(borders, patientList.get(i)));
         }
     }
 
@@ -92,7 +92,7 @@ public class ConvexHullTest {
         }
 
         for (int i = 0; i < 10; i++){
-            Assert.assertEquals(ConvexHull.isInBorder(borders, patientList.get(i)), false);
+            Assert.assertFalse(ConvexHull.isInBorder(borders, patientList.get(i)));
         }
     }
 }

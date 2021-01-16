@@ -2,12 +2,11 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class IntersectionTest {
     List<Hospital> hospitalList;
@@ -16,7 +15,7 @@ public class IntersectionTest {
     Intersection intersection;
 
     @BeforeTest
-    public void initialize() throws FileNotFoundException {
+    public void initialize() {
         intersection = new Intersection();
         hospitalList = new ArrayList<>();
         roadList = new ArrayList<>();
@@ -59,32 +58,32 @@ public class IntersectionTest {
         Assert.assertEquals(result, expected);
     }
 
-    @Test
+    @Test(priority = 1)
     public void testDoIntersect_shouldReturnTrue() {
-        assertEquals(Intersection.doIntersect(intersection.createPoint(10,10), intersection.createPoint(100,100), intersection.createPoint(100,10), intersection.createPoint(10,100)),true);
+        assertTrue(Intersection.doIntersect(intersection.createPoint(10, 10), intersection.createPoint(100, 100), intersection.createPoint(100, 10), intersection.createPoint(10, 100)));
     }
 
-    @Test
+    @Test(priority = 1)
     public void testDoIntersect_shouldReturnFalse() {
-        assertEquals(Intersection.doIntersect(intersection.createPoint(10,10), intersection.createPoint(100,100), intersection.createPoint(11,10), intersection.createPoint(101,100)),false);
+        assertFalse(Intersection.doIntersect(intersection.createPoint(10, 10), intersection.createPoint(100, 100), intersection.createPoint(11, 10), intersection.createPoint(101, 100)));
     }
 
-    @Test
+    @Test(priority = 1)
     public void testFindCrossPoint() {
         double[] expected = {55.0, 55.0};
 
-        double[] result = Intersection.findCrossPoint(intersection.createPoint(10,10), intersection.createPoint(100,100), intersection.createPoint(100,10), intersection.createPoint(10,100));
+        double[] result = Intersection.findCrossPoint(intersection.createPoint(10, 10), intersection.createPoint(100, 100), intersection.createPoint(100, 10), intersection.createPoint(10, 100));
 
         assertTrue(expected[0] == result[0] && expected[1] == result[1]);
     }
 
-    @Test
+    @Test(priority = 1)
     public void testFindIntersections() {
-        Hospital expected = new Hospital(6,"Intersection 1" ,68.5, 81.5, 0, 0);
+        Hospital expected = new Hospital(6, "Intersection 1", 68.5, 81.5, 0, 0);
         Hospital result;
 
         intersection.findIntersections(hospitalList, intersectionList, roadList);
-        result = intersectionList.get(intersectionList.size()-1);
+        result = intersectionList.get(intersectionList.size() - 1);
 
         Assert.assertTrue(expected.getId() == result.getId() && expected.getX() == result.getX() && expected.getY() == result.getY());
     }

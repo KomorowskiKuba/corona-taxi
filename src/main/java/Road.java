@@ -1,10 +1,9 @@
-import java.util.List;
 import java.util.Objects;
 
 public class Road {
     private final int id;
-    private Hospital firstHospital;
-    private Hospital secondHospital;
+    private final Hospital firstHospital;
+    private final Hospital secondHospital;
     private final double distance;
 
     public Road(int id, Hospital firstHospital, Hospital secondHospital, double distance) {

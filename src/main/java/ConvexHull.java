@@ -43,14 +43,14 @@ public class ConvexHull {
             counter++;
         }
 
-        for (int i = 0; i < monumentList.size(); i++) {
+        for (Monument monument : monumentList) {
             Coordinates point = new Coordinates();
-            point.x = (int) monumentList.get(i).getX();
-            point.y = (int) monumentList.get(i).getY();
+            point.x = (int) monument.getX();
+            point.y = (int) monument.getY();
             points[counter++] = point;
         }
 
-        Vector<Coordinates> hull = new Vector<Coordinates>();
+        Vector<Coordinates> hull = new Vector<>();
 
         int l = 0;
         for (int i = 1; i < n; i++)

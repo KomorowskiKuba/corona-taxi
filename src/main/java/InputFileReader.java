@@ -140,7 +140,7 @@ public class InputFileReader {
                                 Hospital newHospital = new Hospital(id, name, x, y, amountOfTotalBeds, amountOfFreeBeds);
 
                                 if (checkBasicParameters(newHospital) && !hospitalList.contains(newHospital) &&
-                                    newHospital.getEmptyBeds() < FREE_BEDS_LIMIT && newHospital.getTotalBeds() < ALL_BEDS_LIMIT && newHospital.getEmptyBeds() <= newHospital.getTotalBeds()) {
+                                        newHospital.getEmptyBeds() < FREE_BEDS_LIMIT && newHospital.getTotalBeds() < ALL_BEDS_LIMIT && newHospital.getEmptyBeds() <= newHospital.getTotalBeds()) {
                                     hospitalList.add(newHospital);
                                 } else {
                                     throw new IllegalArgumentException("Szpital nr: " + newHospital.getId() + " przekroczyl mozliwe limity danych lub znajduje sie juz w liscie szpitali!");
@@ -255,7 +255,7 @@ public class InputFileReader {
 
     private static boolean checkIfLineIsAComment(String line, String comment) {
         if (line.charAt(0) == '#') {
-            if (line.equals(line)) { //TODO: CHANGE THIS
+            if (line.equals(comment)) {
                 return true;
             } else {
                 throw new IllegalArgumentException("Linia z komentarzem nie jest taka jak oczekiwano!");

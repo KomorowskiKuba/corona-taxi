@@ -58,7 +58,7 @@ public class InputFileReaderTest {
         InputFileReader inputFileReader = new InputFileReader(missingDataFilePath, readPatients);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!")
+    @Test(expectedExceptions = IllegalArgumentException.class, expectedExceptionsMessageRegExp = "Linia z komentarzem nie jest taka jak oczekiwano!")
     public void readFromFile_givenFileWithWrongComment_IllegalArgumentExceptionThrown() throws FileNotFoundException {
         String filePath = "src/main/tests/test_data/wrong_comments_file.txt";
         boolean readPatients = true;
