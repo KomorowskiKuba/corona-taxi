@@ -20,9 +20,9 @@ public class InputFileReader {
     private static final int X_LIMIT = 100_000_000;
     private static final int Y_LIMIT = 100_000_000;
     private static final int ID_LIMIT = 100_000_000;
-    private static final int ALL_BEDS_LIMIT = 100_000_000;
-    private static final int FREE_BEDS_LIMIT = 100_000_000;
-    private static final int DISTANCE_LIMIT = 100_000_000;
+    private static final int ALL_BEDS_LIMIT = 1_000_000;
+    private static final int FREE_BEDS_LIMIT = 1_000_000;
+    private static final int DISTANCE_LIMIT = 10_000_000;
 
     public InputFileReader(String filePath, boolean readPatients) throws IllegalFormatException, FileNotFoundException, NullPointerException {
         hospitalList = new ArrayList<>();
