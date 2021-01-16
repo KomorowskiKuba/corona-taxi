@@ -2,7 +2,7 @@
 1 | Szpital Wojewódzki nr 997 | 10 | 10 | 1000 | 0
 2 | Krakowski Szpital Kliniczny | 100 | 120 | 999 | 0
 3 | Pierwszy Szpital im. Prezesa RP | 120 | 130 | 99 | 0
-4 | Drugi Szpital im. Naczelnika RP | 10 | 140 | 70 | 100
+4 | Drugi Szpital im. Naczelnika RP | 10 | 140 | 120 | 100
 5 | Trzeci Szpital im. Króla RP | 140 | 10 | 996 | 0
 # Obiekty (id | nazwa | wsp. x | wsp. y)
 1 | Pomnik Wikipedii | -1 | 50

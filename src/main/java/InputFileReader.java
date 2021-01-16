@@ -17,6 +17,13 @@ public class InputFileReader {
     private static List<Patient> patientList;
     private static List<Hospital> hospitalAndIntersectionList;
 
+    private static final int X_LIMIT = 100_000_000;
+    private static final int Y_LIMIT = 100_000_000;
+    private static final int ID_LIMIT = 100_000_000;
+    private static final int ALL_BEDS_LIMIT = 100_000_000;
+    private static final int FREE_BEDS_LIMIT = 100_000_000;
+    private static final int DISTANCE_LIMIT = 100_000_000;
+
     public InputFileReader(String filePath, boolean readPatients) throws IllegalFormatException, FileNotFoundException, NullPointerException {
         hospitalList = new ArrayList<>();
         monumentList = new ArrayList<>();
@@ -89,7 +96,13 @@ public class InputFileReader {
                                 int x = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
                                 int y = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
 
-                                patientList.add(new Patient(id, x, y));
+                                Patient newPatient = new Patient(id, x, y);
+
+                                if (checkBasicParameters(newPatient) && !patientList.contains(newPatient)) {
+                                    patientList.add(newPatient);
+                                } else {
+                                    throw new IllegalArgumentException("Pacjent nr: " + newPatient.getId() + " przekroczyl mozliwe limity danych lub znajduje sie juz w liscie pacjentow!");
+                                }
                             } catch (NumberFormatException nfe) {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym: " + filePath + " , linia: " + lineNumber + "!");
                             }
@@ -124,7 +137,14 @@ public class InputFileReader {
                                 int amountOfTotalBeds = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
                                 int amountOfFreeBeds = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
 
-                                hospitalList.add(new Hospital(id, name, x, y, amountOfTotalBeds, amountOfFreeBeds));
+                                Hospital newHospital = new Hospital(id, name, x, y, amountOfTotalBeds, amountOfFreeBeds);
+
+                                if (checkBasicParameters(newHospital) && !hospitalList.contains(newHospital) &&
+                                    newHospital.getEmptyBeds() < FREE_BEDS_LIMIT && newHospital.getTotalBeds() < ALL_BEDS_LIMIT && newHospital.getEmptyBeds() <= newHospital.getTotalBeds()) {
+                                    hospitalList.add(newHospital);
+                                } else {
+                                    throw new IllegalArgumentException("Szpital nr: " + newHospital.getId() + " przekroczyl mozliwe limity danych lub znajduje sie juz w liscie szpitali!");
+                                }
                             } catch (NumberFormatException nfe) {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym: " + filePath + " , linia: " + lineNumber + "!");
                             }
@@ -160,7 +180,13 @@ public class InputFileReader {
                                 int x = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
                                 int y = Integer.parseInt(removeSpaces(stringTokenizer.nextToken()));
 
-                                monumentList.add(new Monument(id, name, x, y));
+                                Monument newMonument = new Monument(id, name, x, y);
+
+                                if (checkBasicParameters(newMonument) && !monumentList.contains(newMonument)) {
+                                    monumentList.add(new Monument(id, name, x, y));
+                                } else {
+                                    throw new IllegalArgumentException("Monument nr: " + newMonument.getId() + " przekroczyl mozliwe limity danych lub znajduje sie juz w liscie monumentow!");
+                                }
                             } catch (NumberFormatException nfe) {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym: " + filePath + " , linia: " + lineNumber + "!");
                             }
@@ -196,15 +222,24 @@ public class InputFileReader {
                                 Hospital firstHospital = Hospital.findHospitalById(hospitalList, firstHospitalId);
                                 Hospital secondHospital = Hospital.findHospitalById(hospitalList, secondHospitalId);
 
-                                Objects.requireNonNull(firstHospital).addDestination(secondHospital, distance);
-                                Objects.requireNonNull(secondHospital).addDestination(firstHospital, distance);
+                                if (firstHospital != null && secondHospital != null) {
+                                    Road newRoad = new Road(roadId, firstHospital, secondHospital, distance);
 
-                                roadList.add(new Road(roadId, firstHospital, secondHospital, distance));
+                                    if (newRoad.getId() < ID_LIMIT && distance < DISTANCE_LIMIT && !roadList.contains(newRoad)) {
+                                        roadList.add(newRoad);
+                                        firstHospital.addDestination(secondHospital, distance);
+                                        secondHospital.addDestination(firstHospital, distance);
+                                    } else {
+                                        throw new IllegalArgumentException("Droga nr: " + newRoad.getId() + " przekroczyla mozliwe limity danych lub znajduje sie juz w liscie drog!");
+                                    }
+                                } else {
+                                    throw new IllegalArgumentException("Szpitale: " + firstHospitalId + ", " + secondHospitalId + " nie istnieja!");
+                                }
                             } catch (NumberFormatException nfe) {
                                 throw new NumberFormatException("Niepoprawne dane w pliku wejsciowym: " + filePath + " , linia: " + lineNumber + "!");
                             }
                         } else {
-                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w pliku wejsciowym: " + filePath + " ,w linii: " + lineNumber + "!\nPopraw strukture pliku!");
+                            throw new IllegalArgumentException("Nieprawidlowa ilosc atrybutow w pliku wejsciowym: " + filePath + ", w linii: " + lineNumber + "!\nPopraw strukture pliku!");
                         }
                     }
                 }
@@ -212,6 +247,10 @@ public class InputFileReader {
                 throw new IllegalArgumentException("Nieprawidłowe dane wejsciowe!\nSprawdz poprawnosc danych w pliku wejsciowym!");
             }
         }
+    }
+
+    private static boolean checkBasicParameters(MapObject mapObject) {
+        return mapObject.getX() < X_LIMIT && mapObject.getY() < Y_LIMIT && mapObject.getId() < ID_LIMIT;
     }
 
     private static boolean checkIfLineIsAComment(String line, String comment) {

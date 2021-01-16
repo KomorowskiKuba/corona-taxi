@@ -3,7 +3,7 @@ import java.util.Objects;
 public class Monument extends MapObject {
     private final String name;
 
-    Monument(int id, String name, int x, int y) {
+    Monument(int id, String name, double x, double y) {
         super(id, x, y);
         this.name = name;
     }

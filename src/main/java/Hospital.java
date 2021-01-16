@@ -43,6 +43,10 @@ public class Hospital extends MapObject {
         return emptyBeds;
     }
 
+    public int getTotalBeds() {
+        return totalBeds;
+    }
+
     public double getDistance() {
         return distance;
     }
