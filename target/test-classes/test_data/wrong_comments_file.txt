@@ -1,4 +1,0 @@
-# TONIETENKOMENTARZ (id | wsp. x | wsp.y)
-1 | 20 | 20
-2 | 99 | 105
-3 | 23 | 40
