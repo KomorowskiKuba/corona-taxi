@@ -255,11 +255,7 @@ public class InputFileReader {
 
     private static boolean checkIfLineIsAComment(String line, String comment) {
         if (line.charAt(0) == '#') {
-            if (line.equals(comment)) {
-                return true;
-            } else {
-                throw new IllegalArgumentException("Linia z komentarzem nie jest taka jak oczekiwano!");
-            }
+            return true;
         } else {
             return false;
         }
